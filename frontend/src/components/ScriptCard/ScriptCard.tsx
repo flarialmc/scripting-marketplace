@@ -83,7 +83,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
           <div className="relative inline-flex rounded">
             <button
               onClick={() => window.location.href = `minecraft://scripting?scriptId=${script.id}`}
-              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 text-sm hover:bg-[#383838] dark:hover:bg-[#ccc] transition-colors rounded-l"
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 text-sm hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 transition-all duration-200 rounded-l font-medium"
               aria-label="Import script to Minecraft"
               title="Import directly into Minecraft"
             >
@@ -96,11 +96,11 @@ export function ScriptCard({ script }: ScriptCardProps) {
               />
               Import
             </button>
-            <div className="w-px h-full bg-black/20 dark:bg-white/20" />
+            <div className="w-px h-full bg-red-300/50 dark:bg-red-200/20" />
             <button
               ref={buttonRef}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center px-3 py-2 bg-foreground text-background hover:bg-[#383838] dark:hover:bg-[#ccc] transition-colors rounded-r"
+              className="flex items-center px-3 py-2 bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 transition-all duration-200 rounded-r font-medium"
               aria-label="Show download options"
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
