@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Script } from '@/types/script';
-import { downloadScript } from '@/services/scripts';
+import { getScriptDownloadResponse } from '@/services/scripts';
 
 interface ScriptCardProps {
   script: Script;
@@ -11,10 +11,28 @@ interface ScriptCardProps {
 export function ScriptCard({ script }: ScriptCardProps) {
   const handleDownload = async () => {
     try {
-      await downloadScript(script.id);
+      const response = await getScriptDownloadResponse(script.id);
+      
+      // Get filename from Content-Disposition header or fallback
+      const contentDisposition = response.headers.get('content-disposition');
+      const filenameMatch = contentDisposition?.match(/filename=(.+\.tar\.gz)/) || [];
+      const filename = filenameMatch[1] || `${script.name}.tar.gz`;
+      
+      // Create blob from response and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      
+      // Trigger download and cleanup
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading script:', error);
-      // TODO: Add proper error handling/notification
+      // TODO: Add user-facing error notification
     }
   };
 
