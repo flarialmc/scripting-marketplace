@@ -1,5 +1,31 @@
 # Decision Log
 
+## 2024-02-24 - API Documentation Standard Implementation
+
+**Context:** 
+Need for standardized API documentation to improve developer experience and maintainability. Currently, API endpoints are only documented in code comments.
+
+**Decision:**
+Implement OpenAPI/Swagger specification as the standard for API documentation.
+
+**Rationale:**
+1. Industry-standard format with wide tooling support
+2. Machine-readable specification enables automated client generation
+3. Provides interactive documentation through Swagger UI
+4. Ensures consistency in API documentation
+
+**Implementation:**
+1. Created /docs directory in backend
+2. Added OpenAPI 3.0 specification
+3. Included comprehensive README with examples
+4. Documented security considerations and error handling
+
+**Technical Details:**
+- OpenAPI 3.0 format
+- Located in backend/docs/
+- Includes examples and security documentation
+- Supports Swagger UI integration
+
 ## 2024-02-24 - Script Distribution Format Change
 
 **Context:** 
