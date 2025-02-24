@@ -1,0 +1,6 @@
+{
+    "name": "directionhud",
+    "description": "2a",
+    "main_class": "test.lua",
+    "api_revision": 2
+}
