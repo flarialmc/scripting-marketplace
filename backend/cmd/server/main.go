@@ -4,6 +4,7 @@ import (
 "encoding/json"
 "log"
 "net/http"
+"strings"
 
 "backend/internal/api/handlers/scripts"
 )
@@ -30,7 +31,11 @@ mux.HandleFunc("/health", healthHandler)
 mux.HandleFunc("/api/scripts", scriptHandler.HandleListScripts)
 mux.HandleFunc("/api/scripts/", func(w http.ResponseWriter, r *http.Request) {
 if len(r.URL.Path) > len("/api/scripts/") {
+if strings.HasSuffix(r.URL.Path, "/download") {
+scriptHandler.HandleDownloadScript(w, r)
+} else {
 scriptHandler.HandleGetScript(w, r)
+}
 } else {
 http.NotFound(w, r)
 }

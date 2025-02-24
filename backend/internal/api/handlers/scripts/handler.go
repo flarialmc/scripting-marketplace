@@ -1,12 +1,16 @@
 package scripts
 
 import (
-"encoding/json"
-"log"
-"net/http"
-"os"
-"path/filepath"
-"strings"
+	"archive/tar"
+	"compress/gzip"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type ScriptHandler struct {
@@ -136,4 +140,123 @@ contentType = "text/plain"
 
 w.Header().Set("Content-Type", contentType)
 http.ServeFile(w, r, filePath)
+}
+
+// HandleDownloadScript handles GET requests to download a script as a gzipped archive
+func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Request) {
+if r.Method != http.MethodGet {
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	return
+}
+
+// Extract script ID from path
+scriptID := strings.TrimPrefix(r.URL.Path, "/api/scripts/")
+scriptID = strings.TrimSuffix(scriptID, "/download")
+
+if strings.Contains(scriptID, "..") {
+	http.Error(w, "Invalid script ID", http.StatusBadRequest)
+	return
+}
+
+scriptDir := filepath.Join(h.baseDir, scriptID)
+
+// Verify directory exists and is within base directory
+absPath, err := filepath.Abs(scriptDir)
+if err != nil || !strings.HasPrefix(absPath, h.baseDir) {
+	log.Printf("Invalid script directory: %s", scriptDir)
+	http.Error(w, "Invalid script directory", http.StatusBadRequest)
+	return
+}
+
+// Check if directory exists
+dirInfo, err := os.Stat(scriptDir)
+if err != nil {
+	if os.IsNotExist(err) {
+		log.Printf("Script directory not found: %s", scriptDir)
+		http.Error(w, "Script not found", http.StatusNotFound)
+	} else {
+		log.Printf("Error accessing script directory: %v", err)
+		http.Error(w, "Error accessing script", http.StatusInternalServerError)
+	}
+	return
+}
+
+if !dirInfo.IsDir() {
+	http.Error(w, "Not a script directory", http.StatusBadRequest)
+	return
+}
+
+// Set response headers
+w.Header().Set("Content-Type", "application/gzip")
+w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.tar.gz", scriptID))
+
+// Create gzip writer
+gw := gzip.NewWriter(w)
+defer gw.Close()
+
+// Create tar writer
+tw := tar.NewWriter(gw)
+defer tw.Close()
+
+// Walk through the script directory
+err = filepath.Walk(scriptDir, func(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+
+	// Skip the directory itself
+	if path == scriptDir {
+		return nil
+	}
+
+	// Skip hidden files and directories
+	if strings.HasPrefix(filepath.Base(path), ".") {
+		if info.IsDir() {
+			return filepath.SkipDir
+		}
+		return nil
+	}
+
+	// Create tar header
+	header, err := tar.FileInfoHeader(info, "")
+	if err != nil {
+		return fmt.Errorf("error creating tar header: %v", err)
+	}
+
+	// Update header name to be relative to script directory
+	relPath, err := filepath.Rel(scriptDir, path)
+	if err != nil {
+		return fmt.Errorf("error getting relative path: %v", err)
+	}
+	header.Name = relPath
+
+	// Write header
+	if err := tw.WriteHeader(header); err != nil {
+		return fmt.Errorf("error writing tar header: %v", err)
+	}
+
+	// If it's a directory, continue
+	if info.IsDir() {
+		return nil
+	}
+
+	// Open and copy file contents
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("error opening file: %v", err)
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(tw, file); err != nil {
+		return fmt.Errorf("error copying file contents: %v", err)
+	}
+
+	return nil
+})
+
+if err != nil {
+	log.Printf("Error creating archive: %v", err)
+	http.Error(w, "Error creating archive", http.StatusInternalServerError)
+	return
+}
 }
