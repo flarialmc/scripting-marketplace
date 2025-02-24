@@ -1,6 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import { Script } from '@/types/script';
-import { scriptsService } from '@/services/scripts';
+import { downloadScript } from '@/services/scripts';
 
 interface ScriptCardProps {
   script: Script;
@@ -9,7 +11,7 @@ interface ScriptCardProps {
 export function ScriptCard({ script }: ScriptCardProps) {
   const handleDownload = async () => {
     try {
-      await scriptsService.downloadScript(script.id);
+      await downloadScript(script.id);
     } catch (error) {
       console.error('Error downloading script:', error);
       // TODO: Add proper error handling/notification
