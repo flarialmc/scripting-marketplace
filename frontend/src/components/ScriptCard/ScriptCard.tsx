@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Script } from '@/types/script';
+import { scriptsService } from '@/services/scripts';
 
 interface ScriptCardProps {
   script: Script;
@@ -8,18 +9,10 @@ interface ScriptCardProps {
 export function ScriptCard({ script }: ScriptCardProps) {
   const handleDownload = async () => {
     try {
-      const response = await fetch(script.downloadUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${script.name}.lua`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      await scriptsService.downloadScript(script.id);
     } catch (error) {
       console.error('Error downloading script:', error);
+      // TODO: Add proper error handling/notification
     }
   };
 
