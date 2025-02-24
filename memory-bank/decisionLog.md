@@ -1,42 +1,37 @@
 # Decision Log
 
-## 2024-02-24 16:02 - Backend File Server Implementation
+## 2024-02-24 - Script Distribution Format Change
 
-### Context
-Need to implement a file server for the backend that can serve Lua scripts and metadata files.
+**Context:** 
+Currently, scripts are served as individual files. This requires multiple requests to download a complete script package and doesn't guarantee consistency between files.
 
-### Decisions
+**Decision:**
+Modify the script serving mechanism to deliver entire script directories as gzipped archives.
 
-1. **Directory Structure**
-   - **Decision**: Place scripts directory within backend/
-   - **Rationale**: Keeps script files close to the server implementation and maintains better organization
-   - **Implementation**: Created `backend/scripts/` directory structure
+**Rationale:**
+1. Single request download improves efficiency
+2. Ensures atomic delivery of all script files
+3. Maintains script package integrity
+4. Reduces network overhead through compression
 
-2. **File Handler Implementation**
-   - **Decision**: Created dedicated scripts handler package
-   - **Rationale**: Separates concerns and makes the codebase more maintainable
-   - **Implementation**: `backend/internal/api/handlers/scripts/handler.go`
+**Implementation Plan:**
+1. Add new endpoint: `GET /api/scripts/{scriptId}/download`
+   - Returns entire script directory as gzipped archive
+   - Content-Type: application/gzip
+   - Suggested filename via Content-Disposition header
 
-3. **API Design**
-   - **Decision**: Two main endpoints
-     - GET /api/scripts - List all scripts with metadata
-     - GET /api/scripts/{script-id}/{filename} - Serve individual files
-   - **Rationale**: Clean REST API design that separates listing from file serving
+2. Modify ScriptHandler:
+   - Add new method for handling archive downloads
+   - Implement directory gzipping functionality
+   - Add proper error handling and logging
 
-4. **Security Measures**
-   - **Decision**: Implemented security checks
-     - Path traversal prevention
-     - Strict file access validation
-     - Proper error handling
-   - **Rationale**: Prevent unauthorized access and ensure secure file serving
+3. Keep existing endpoints:
+   - `/api/scripts` (listing)
+   - `/api/scripts/{scriptId}/{filename}` (individual file access)
+   These remain useful for browsing and inspection.
 
-### Impact
-- Clean separation of concerns
-- Secure file serving implementation
-- Easy to extend with new script types
-- Maintainable codebase structure
-
-### Verification
-- Tested all endpoints
-- Verified security measures
-- Confirmed proper file serving
+**Technical Details:**
+- Use Go's archive/tar and compress/gzip packages
+- Include all files from script directory
+- Exclude system files (e.g., .DS_Store)
+- Set appropriate HTTP headers for download
