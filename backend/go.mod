@@ -1,3 +1,3 @@
-module github.com/flarial/scripting-marketplace
+module backend
 
 go 1.23.6

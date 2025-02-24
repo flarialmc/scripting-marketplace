@@ -1,35 +1,50 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
+"encoding/json"
+"log"
+"net/http"
+
+"backend/internal/api/handlers/scripts"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]string{
-		"status": "healthy",
-		"server": "Flarial Scripting Marketplace",
-	}
+response := map[string]string{
+"status": "healthy",
+"server": "Flarial Scripting Marketplace",
+}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+w.Header().Set("Content-Type", "application/json")
+json.NewEncoder(w).Encode(response)
 }
 
 func main() {
-	// Configure routes
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
+// Configure routes
+mux := http.NewServeMux()
 
-	// Configure server
-	server := &http.Server{
-		Addr:    ":5019",
-		Handler: mux,
-	}
+// Set up script handler with base directory
+scriptHandler := scripts.NewScriptHandler("scripts") // Path relative to backend directory
 
-	// Start server
-	log.Printf("Starting server on :5019")
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("Server failed to start: %v", err)
-	}
+// Routes
+mux.HandleFunc("/health", healthHandler)
+mux.HandleFunc("/api/scripts", scriptHandler.HandleListScripts)
+mux.HandleFunc("/api/scripts/", func(w http.ResponseWriter, r *http.Request) {
+if len(r.URL.Path) > len("/api/scripts/") {
+scriptHandler.HandleGetScript(w, r)
+} else {
+http.NotFound(w, r)
+}
+})
+
+// Configure server
+server := &http.Server{
+Addr:    ":5019",
+Handler: mux,
+}
+
+// Start server
+log.Printf("Starting server on :5019")
+if err := server.ListenAndServe(); err != nil {
+log.Fatalf("Server failed to start: %v", err)
+}
 }
