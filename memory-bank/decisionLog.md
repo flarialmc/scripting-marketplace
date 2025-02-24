@@ -53,3 +53,47 @@ scripts/
 - Straightforward integration with frontend
 - Easy to extend and maintain
 - Standard HTTP methods for operations
+
+## [2024-02-24] - Backend Project Structure
+**Context:** Need to establish a clean, maintainable Go project structure
+**Decision:** Implementing a layered architecture with the following structure:
+```
+backend/
+├── cmd/
+│   └── server/           # Application entry point
+│       └── main.go
+├── internal/
+│   ├── api/             # API route handlers
+│   │   ├── handlers/    # HTTP handlers
+│   │   ├── middleware/  # HTTP middleware
+│   │   └── router.go    # Router setup
+│   ├── core/            # Core business logic
+│   │   ├── models/      # Data models
+│   │   └── services/    # Business logic services
+│   ├── storage/         # File system operations
+│   │   ├── scripts/     # Script file management
+│   │   └── metadata/    # JSON metadata handling
+│   └── config/          # Configuration management
+├── pkg/                 # Public packages
+│   ├── validation/      # Script validation utilities
+│   └── types/          # Shared type definitions
+├── scripts/            # Script repository
+├── go.mod
+└── go.sum
+```
+**Rationale:**
+- Clear separation of concerns with layered architecture
+- Internal packages for application-specific code
+- Public packages for reusable utilities
+- Standard Go project layout conventions
+- Easy to test and maintain
+- Scalable structure for future extensions
+
+**Implementation Plan:**
+1. Initialize Go module
+2. Create directory structure
+3. Set up basic HTTP server
+4. Implement file server functionality
+5. Add API route handlers
+6. Integrate script validation
+7. Implement rate limiting
