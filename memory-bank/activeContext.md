@@ -1,9 +1,9 @@
 # Active Development Context
 
 ## Current Session Context
-[2024-02-24 15:29]
+[2024-02-24 15:32]
 
-Just completed initial backend setup with Go. Backend will run on port 5019, with frontend planned for port 5020 (both will be proxied behind nginx). Following git-based workflow with commits after each significant change.
+Just completed initial backend setup with Go. Backend will run on port 5019, with frontend planned for port 5020 (both will be proxied behind nginx). Following git-based workflow with commits after each significant change and testing each implementation.
 
 ## Current Phase
 Phase 1: Backend Development (Initial Setup)
@@ -31,6 +31,19 @@ Phase 1: Backend Development (Initial Setup)
 - Commit after every significant change
 - Clear, descriptive commit messages
 - Atomic commits focused on single features/changes
+- Test functionality after each implementation:
+  * Run server and verify endpoints
+  * Test with curl/http tools
+  * Verify file operations
+  * Check error handling
+
+## Testing Strategy
+For each implementation:
+1. Start the server
+2. Test basic functionality
+3. Test edge cases
+4. Verify error handling
+5. Document test results in commits
 
 ## Open Questions
 1. API versioning strategy

@@ -64,6 +64,20 @@ scripts/
 - Safer development with atomic commits
 - Facilitates rollback if needed
 
+### Development Workflow
+**Context:** Need for reliable and tested code implementation
+**Decision:** Test-driven development approach:
+- Run and verify functionality after each implementation
+- Manual testing of endpoints using curl/http tools
+- Verify file operations work as expected
+- Test edge cases and error handling
+**Rationale:**
+- Early bug detection
+- Verified functionality
+- Better code quality
+- Confidence in implementations
+- Easier to spot regressions
+
 ### Port Configuration
 **Context:** Need to define specific ports for services
 **Decision:** Using fixed ports for backend and frontend services:
