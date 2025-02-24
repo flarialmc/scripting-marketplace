@@ -1,6 +1,8 @@
 {
-  "name": "Test Script",
-  "description": "A test script for verifying file server functionality",
+  "name": "Script Name",
+  "description": "Script description",
   "version": "1.0.0",
-  "author": "Flarial"
+  "author": "Author Name",
+  "createdAt": "2024-02-24T00:00:00Z",
+  "updatedAt": "2024-02-24T00:00:00Z"
 }
