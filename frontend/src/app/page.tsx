@@ -48,19 +48,14 @@ export default async function Home() {
             <p className="text-gray-600 dark:text-gray-400">No scripts available yet.</p>
           </div>
         ) : (
-          <ScriptGrid 
-            scripts={scripts} 
-            containerClass="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12"
-            cardClass="w-32 h-32 rounded-lg bg-gray-200/40 dark:bg-gray-800/40 border-2 border-white shadow-lg backdrop-blur-md"
-            buttonClass="bg-green-700 text-black font-bold py-2 px-4 rounded shadow-md hover:bg-green-800 transition mt-4" 
-          />
+          <ScriptGrid scripts={scripts} />
         )}
       </main>
 
       {/* Floating Footer */}
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center text-white z-10">
         <p className="text-sm">© 2025 Flarial. All Rights Reserved.</p>
-        <p className="text-sm">Made with ❤️ by the MBG1337 and Ashank.</p>
+        <p className="text-sm">Made with ❤️ by the Flarial team.</p>
       </div>
     </div>
   );
