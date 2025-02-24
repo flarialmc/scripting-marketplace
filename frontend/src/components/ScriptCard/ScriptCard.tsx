@@ -62,7 +62,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
   };
 
   return (
-    <div className="group relative p-6 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all duration-300 ease-in-out scale-100 hover:scale-[1.05] hover:z-10 hover:shadow-black shadow-md">
+    <div className="group relative p-6 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all duration-300 ease-in-out scale-100 hover:scale-[1.05] hover:z-10 hover:shadow-red-950 shadow-md">
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between">
           <div>
