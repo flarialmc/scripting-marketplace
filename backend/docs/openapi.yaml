@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: Flarial Script Marketplace API
+  description: API documentation for the Flarial Script Marketplace
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/scripts/{scriptId}/download:
+    get:
+      summary: Download a script package
+      description: Downloads a script and its associated files as a gzipped tar archive
+      operationId: downloadScript
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          description: Unique identifier of the script to download
+          schema:
+            type: string
+            pattern: "^[^.]+$"  # Prevents path traversal attempts
+      responses:
+        '200':
+          description: Script package downloaded successfully
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                enum: [application/gzip]
+              description: MIME type of the response
+            Content-Disposition:
+              schema:
+                type: string
+                pattern: '^attachment; filename=.+\.tar\.gz$'
+              description: Attachment header with the download filename
+          content:
+            application/gzip:
+              schema:
+                type: string
+                format: binary
+              description: A gzipped tar archive containing all script files
+        '400':
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                invalid-id:
+                  value: "Invalid script ID"
+                invalid-path:
+                  value: "Invalid script directory"
+        '404':
+          description: Script not found
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: "Script not found"
+        '405':
+          description: Method not allowed
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: "Method not allowed"
+        '500':
+          description: Internal server error
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                archive-error:
+                  value: "Error creating archive"
+                access-error:
+                  value: "Error accessing script"
+
+      security:
+        - basicAuth: []  # Assuming basic auth is used
+        
+      tags:
+        - Scripts
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: Scripts
+    description: Operations for managing and downloading scripts
