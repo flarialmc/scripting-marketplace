@@ -1,8 +1,9 @@
 {
-  "name": "Script Name",
-  "description": "Script description",
-  "version": "1.0.0",
-  "author": "Author Name",
-  "createdAt": "2024-02-24T00:00:00Z",
-  "updatedAt": "2024-02-24T00:00:00Z"
+    "id": "26f63e42-fa71-4fd0-a7d5-8587bd5381b1",
+    "name": "Script Name",
+    "description": "Script description",
+    "version": "1.0.0",
+    "author": "Author Name",
+    "createdAt": "2024-02-24T00:00:00Z",
+    "updatedAt": "2024-02-24T00:00:00Z"
 }

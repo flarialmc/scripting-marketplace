@@ -1,6 +1,9 @@
 {
+    "id": "dda19a57-61ab-4e78-ace7-96cd64976011",
     "name": "directionhud",
     "description": "2a",
     "main_class": "test.lua",
-    "api_revision": 2
+    "api_revision": 2,
+    "createdAt": "2024-02-24T00:00:00Z",
+    "updatedAt": "2024-02-24T00:00:00Z"
 }
