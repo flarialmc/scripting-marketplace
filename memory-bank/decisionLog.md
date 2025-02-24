@@ -54,6 +54,27 @@ scripts/
 - Easy to extend and maintain
 - Standard HTTP methods for operations
 
+### Version Control Strategy
+**Context:** Need for consistent and traceable development history
+**Decision:** Commit after every significant change
+**Rationale:**
+- Clear development history
+- Easier code review process
+- Better traceability of changes
+- Safer development with atomic commits
+- Facilitates rollback if needed
+
+### Port Configuration
+**Context:** Need to define specific ports for services
+**Decision:** Using fixed ports for backend and frontend services:
+- Backend: Port 5019
+- Frontend: Port 5020
+**Rationale:**
+- Fixed ports for consistent development setup
+- Distinct ports prevent conflicts
+- Will be proxied behind nginx in production
+- Clear separation between frontend and backend services
+
 ## [2024-02-24] - Backend Project Structure
 **Context:** Need to establish a clean, maintainable Go project structure
 **Decision:** Implementing a layered architecture with the following structure:
