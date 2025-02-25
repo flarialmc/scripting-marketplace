@@ -2,6 +2,8 @@
     "id": "dda19a57-61ab-4e78-ace7-96cd64976011",
     "name": "directionhud",
     "description": "2a",
+    "author": "Author Name",
+    "version": "2.0.0",
     "main_class": "test.lua",
     "api_revision": 2,
     "version": "1.0.0",
