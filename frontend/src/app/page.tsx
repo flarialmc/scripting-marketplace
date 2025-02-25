@@ -55,7 +55,7 @@ export default async function Home() {
       {/* Floating Footer */}
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center text-white z-10">
         <p className="text-sm">© 2025 Flarial. All Rights Reserved.</p>
-        <p className="text-sm">Made with ❤️ by the Flarial team.</p>
+        <p className="text-sm">Made with ❤️ by MBG & Ashank.</p>
       </div>
     </div>
   );
