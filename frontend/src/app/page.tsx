@@ -1,21 +1,49 @@
+'use client';
+import { useState, useRef, useEffect } from 'react';
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { listScripts } from '@/services/scripts';
 import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
+import { FaSearch } from 'react-icons/fa';
 export const dynamic = 'force-dynamic';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
 const flarialLogo = "/images/flarial-logo.png";
 
-export default async function Home() {
-  let scripts;
-  let error;
+export default function Home() {
+  const [scripts, setScripts] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef(null);
 
-  try {
-    scripts = await listScripts();
-  } catch (e) {
-    error = e instanceof Error ? e.message : 'Failed to load scripts';
-  }
+  useEffect(() => {
+    async function fetchScripts() {
+      try {
+        const data = await listScripts();
+        setScripts(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load scripts');
+      }
+    }
+    fetchScripts();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const filteredScripts = scripts.filter(script => 
+    script.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div 
@@ -34,22 +62,38 @@ export default async function Home() {
           </p>
         </div>
 
+        {/* Search Button and Expanding Search Bar */}
+        <div className="absolute top-6 right-6 flex items-center" ref={searchRef}>
+          <div className={`flex items-center transition-all duration-1000 ease-in-out ${isSearchOpen ? 'bg-[#201a1b]/80 p-2 rounded-lg w-64 backdrop-blur-md' : 'w-auto'}`}>
+            {isSearchOpen && <FaSearch size={18} className="text-white mr-2" />}
+            <input 
+              type="text" 
+              placeholder="Search for scripts..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`p-2 rounded-lg border border-neutral-700 bg-[#201a1b]/80 text-white focus:outline-none focus:ring-2 focus:ring-red-700 transition-all duration-1000 ease-in-out ${isSearchOpen ? 'w-64' : 'w-0 opacity-0'}`}
+            />
+            {!isSearchOpen && (
+              <button 
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 rounded-full text-white bg-[#201a1b]/80 hover:bg-[#201a1b]/40 focus:outline-none transition-all duration-700 ease-in-out backdrop-blur-md"
+              >
+                <FaSearch size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+
         {error ? (
           <div className="p-4 rounded-lg bg-red-200 dark:bg-red-900 border border-red-400 dark:border-red-700">
             <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
           </div>
-        ) : !scripts ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse mt-12">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="w-32 h-32 rounded-lg bg-gray-200/40 dark:bg-gray-800/40 border-2 border-white shadow-lg backdrop-blur-md" />
-            ))}
-          </div>
         ) : scripts.length === 0 ? (
           <div className="text-center py-12 mt-12">
-            <p className="text-gray-600 dark:text-gray-400">No scripts available yet.</p>
+            <p className="text-gray-600 dark:text-gray-400">No matching scripts found.</p>
           </div>
         ) : (
-          <ScriptGrid scripts={scripts} />
+          <ScriptGrid scripts={filteredScripts} />
         )}
       </main>
 
