@@ -42,8 +42,8 @@ export function ScriptCard({ script }: ScriptCardProps) {
       
       // Get filename from Content-Disposition header or fallback
       const contentDisposition = response.headers.get('content-disposition');
-      const filenameMatch = contentDisposition?.match(/filename=(.+\.tar\.gz)/) || [];
-      const filename = filenameMatch[1] || `${script.name}.tar.gz`;
+      const filenameMatch = contentDisposition?.match(/filename="?([^"]+\.zip)"?/) || [];
+      const filename = filenameMatch[1] || `${script.name}.zip`;
       
       // Create blob from response and trigger download
       const blob = await response.blob();
