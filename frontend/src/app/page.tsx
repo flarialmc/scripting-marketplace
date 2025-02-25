@@ -2,6 +2,7 @@ import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { listScripts } from '@/services/scripts';
 import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
+export const dynamic = 'force-dynamic';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
 const flarialLogo = "/images/flarial-logo.png";

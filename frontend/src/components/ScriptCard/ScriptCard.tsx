@@ -40,17 +40,20 @@ export function ScriptCard({ script }: ScriptCardProps) {
   const handleDownload = async () => {
     try {
       const response = await getScriptDownloadResponse(script.id);
-
+      
+      // Get filename from Content-Disposition header or fallback
       const contentDisposition = response.headers.get('content-disposition');
-      const filenameMatch = contentDisposition?.match(/filename=(.+\.tar\.gz)/) || [];
-      const filename = filenameMatch[1] || `${script.name}.tar.gz`;
-
+      const filenameMatch = contentDisposition?.match(/filename="?([^"]+\.zip)"?/) || [];
+      const filename = filenameMatch[1] || `${script.name}.zip`;
+      
+      // Create blob from response and trigger download
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
-
+      
+      // Trigger download and cleanup
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -58,8 +61,11 @@ export function ScriptCard({ script }: ScriptCardProps) {
       setIsDropdownOpen(false);
     } catch (error) {
       console.error('Error downloading script:', error);
+      // TODO: Add user-facing error notification
     }
   };
+  
+  
 
   return (
     <div className="group relative p-6 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all duration-300 ease-in-out scale-100 hover:scale-[1.05] hover:z-10 hover:shadow-red-950 shadow-md">
