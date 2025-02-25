@@ -12,10 +12,10 @@ The API documentation is written in OpenAPI 3.0 format and describes all availab
 
 ```bash
 # Download a script package
-curl -X GET http://localhost:8080/api/scripts/my-script/download -o my-script.tar.gz
+curl -X GET http://localhost:8080/api/scripts/my-script/download -o my-script.zip
 
 # Extract the downloaded package
-tar -xzf my-script.tar.gz
+unzip my-script.zip
 ```
 
 ### Security Considerations
@@ -35,7 +35,7 @@ tar -xzf my-script.tar.gz
 
 ### Package Structure
 
-The downloaded `.tar.gz` file contains:
+The downloaded `.zip` file contains:
 - `main.json` - Script metadata and configuration
 - Script implementation files (e.g., `.lua` files)
 - Additional resources and dependencies

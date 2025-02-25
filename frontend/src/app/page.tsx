@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { listScripts } from '@/services/scripts';
 import Image from 'next/image';

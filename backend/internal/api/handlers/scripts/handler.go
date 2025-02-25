@@ -1,8 +1,7 @@
 package scripts
 
 import (
-	"archive/tar"
-	"compress/gzip"
+	"archive/zip"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -51,9 +50,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Handle CORS preflight (for all relevant requests)
-	h.HandleCORS(w, r)
-
 	entries, err := os.ReadDir(h.baseDir)
 	if err != nil {
 		log.Printf("Error reading directory: %v", err)
@@ -92,15 +88,80 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 	})
 }
 
-// HandleDownloadScript handles GET requests to download a script as a gzipped archive
-func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Request) {
+// HandleGetScript handles GET requests for specific script files
+func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Handle CORS preflight
-	h.HandleCORS(w, r)
+	// Extract script ID and filename from path
+	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/scripts/"), "/")
+	if len(parts) < 2 {
+		http.Error(w, "Invalid request path", http.StatusBadRequest)
+		return
+	}
+
+	scriptID := parts[0]
+	filename := parts[1]
+
+	log.Printf("Requested script: %s, file: %s", scriptID, filename)
+
+	// Validate path components
+	if strings.Contains(scriptID, "..") || strings.Contains(filename, "..") {
+		http.Error(w, "Invalid script ID or filename", http.StatusBadRequest)
+		return
+	}
+
+	// Construct file path
+	filePath := filepath.Join(h.baseDir, scriptID, filename)
+	log.Printf("Attempting to serve file: %s", filePath)
+
+	// Verify file exists within script directory
+	absPath, err := filepath.Abs(filePath)
+	if err != nil || !strings.HasPrefix(absPath, h.baseDir) {
+		log.Printf("Invalid file path: %s", filePath)
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+
+	// Check if file exists
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Printf("File not found: %s", filePath)
+			http.Error(w, "File not found", http.StatusNotFound)
+		} else {
+			log.Printf("Error accessing file: %v", err)
+			http.Error(w, "Error accessing file", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Don't serve directories
+	if fileInfo.IsDir() {
+		http.Error(w, "Cannot serve directory", http.StatusBadRequest)
+		return
+	}
+
+	// Determine content type
+	contentType := "application/octet-stream"
+	if strings.HasSuffix(filename, ".json") {
+		contentType = "application/json"
+	} else if strings.HasSuffix(filename, ".lua") {
+		contentType = "text/plain"
+	}
+
+	w.Header().Set("Content-Type", contentType)
+	http.ServeFile(w, r, filePath)
+}
+
+// HandleDownloadScript handles GET requests to download a script as a zip archive
+func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
 	// Extract script ID from path
 	scriptID := strings.TrimPrefix(r.URL.Path, "/api/scripts/")
@@ -139,17 +200,13 @@ func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Set response headers
-	w.Header().Set("Content-Type", "application/gzip")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.tar.gz", scriptID))
+	// Set response headers for zip download
+	w.Header().Set("Content-Type", "application/x-zip-compressed")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.zip\"", scriptID))
 
-	// Create gzip writer
-	gw := gzip.NewWriter(w)
-	defer gw.Close()
-
-	// Create tar writer
-	tw := tar.NewWriter(gw)
-	defer tw.Close()
+	// Create zip writer
+	zw := zip.NewWriter(w)
+	defer zw.Close()
 
 	// Walk through the script directory
 	err = filepath.Walk(scriptDir, func(path string, info os.FileInfo, err error) error {
@@ -170,25 +227,31 @@ func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Requ
 			return nil
 		}
 
-		// Create tar header
-		header, err := tar.FileInfoHeader(info, "")
-		if err != nil {
-			return fmt.Errorf("error creating tar header: %v", err)
-		}
-
-		// Update header name to be relative to script directory
+		// Get relative path for zip entry
 		relPath, err := filepath.Rel(scriptDir, path)
 		if err != nil {
 			return fmt.Errorf("error getting relative path: %v", err)
 		}
-		header.Name = relPath
 
-		// Write header
-		if err := tw.WriteHeader(header); err != nil {
-			return fmt.Errorf("error writing tar header: %v", err)
+		// Create zip file entry
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return fmt.Errorf("error creating zip header: %v", err)
 		}
 
-		// If it's a directory, continue
+		// Set the name to use forward slashes (zip spec)
+		header.Name = filepath.ToSlash(relPath)
+
+		// Set compression method
+		header.Method = zip.Deflate
+
+		// Create file in zip
+		writer, err := zw.CreateHeader(header)
+		if err != nil {
+			return fmt.Errorf("error creating zip entry: %v", err)
+		}
+
+		// If it's a directory, no need to copy contents
 		if info.IsDir() {
 			return nil
 		}
@@ -200,7 +263,7 @@ func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Requ
 		}
 		defer file.Close()
 
-		if _, err := io.Copy(tw, file); err != nil {
+		if _, err := io.Copy(writer, file); err != nil {
 			return fmt.Errorf("error copying file contents: %v", err)
 		}
 
