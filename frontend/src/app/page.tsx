@@ -5,6 +5,7 @@ import { listScripts } from '@/services/scripts';
 import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
 import { FaSearch } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 export const dynamic = 'force-dynamic';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
@@ -62,27 +63,32 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Search Button and Expanding Search Bar */}
-        <div className="absolute top-6 right-6 flex items-center" ref={searchRef}>
-          <div className={`flex items-center transition-all duration-1000 ease-in-out ${isSearchOpen ? 'bg-[#201a1b]/80 p-2 rounded-lg w-64 backdrop-blur-md' : 'w-auto'}`}>
-            {isSearchOpen && <FaSearch size={18} className="text-white mr-2" />}
-            <input 
-              type="text" 
-              placeholder="Search for scripts..." 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`p-2 rounded-lg border border-neutral-700 bg-[#201a1b]/80 text-white focus:outline-none focus:ring-2 focus:ring-red-700 transition-all duration-1000 ease-in-out ${isSearchOpen ? 'w-64' : 'w-0 opacity-0'}`}
-            />
-            {!isSearchOpen && (
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 rounded-full text-white bg-[#201a1b]/80 hover:bg-[#201a1b]/40 focus:outline-none transition-all duration-700 ease-in-out backdrop-blur-md"
-              >
-                <FaSearch size={18} />
-              </button>
-            )}
-          </div>
-        </div>
+        <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+  <motion.div
+    initial={{ width: 40, height: 40 }}
+    animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+    className="relative flex items-center bg-[#201a1b]/80 rounded-lg backdrop-blur-md shadow-lg px-2"
+  >
+    <motion.input
+      type="text"
+      placeholder="Search for scripts..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className={`bg-transparent text-white focus:outline-none transition-all ${
+        isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
+      }`}
+    />
+    <button
+      onClick={() => setIsSearchOpen((prev) => !prev)}
+      className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+    >
+      <FaSearch size={18} className="text-white" />
+    </button>
+  </motion.div>
+</div>
+
+
 
         {error ? (
           <div className="p-4 rounded-lg bg-red-200 dark:bg-red-900 border border-red-400 dark:border-red-700">
