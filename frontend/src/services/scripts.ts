@@ -9,7 +9,11 @@ export async function listScripts(): Promise<Script[]> {
   try {
     const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.LIST}`, {
       cache: 'no-store',
-      mode: 'cors', // Add CORS mode
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
     
     if (!response.ok) {
@@ -21,23 +25,29 @@ export async function listScripts(): Promise<Script[]> {
     
   } catch (error) {
     console.error('Error fetching scripts:', error);
-    throw error;
+    return []; // Return empty array instead of throwing to prevent UI errors
   }
 }
 
 export async function getScriptDownloadResponse(scriptId: string): Promise<Response> {
-  const response = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.DOWNLOAD(scriptId)}`,
-    {
-      method: 'GET',
-      cache: 'no-store',
-      mode: 'cors', // Add CORS mode
+  try {
+    const response = await fetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.DOWNLOAD(scriptId)}`,
+      {
+        method: 'GET',
+        cache: 'no-store',
+        mode: 'cors',
+        credentials: 'same-origin',
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Failed to download script: ${response.statusText}`);
     }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Failed to download script: ${response.statusText}`);
+    
+    return response;
+  } catch (error) {
+    console.error('Error downloading script:', error);
+    throw error; // Rethrow as this is likely used directly by download functions
   }
-
-  return response;
 }
