@@ -1,9 +1,5 @@
 # Go binary files
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+server
 
 # Test binary, built with 'go test -c'
 *.test
