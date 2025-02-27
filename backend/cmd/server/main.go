@@ -65,7 +65,6 @@ func main() {
 	// Configure server with CORS middleware
 	server := &http.Server{
 		Addr:    ":5019",
-		Handler: corsMiddleware(mux),
 	}
 
 	// Start server
