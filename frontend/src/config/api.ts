@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://node2.sear.host:5019',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://1klcjc8um5aq.flarial.xyz',
   ENDPOINTS: {
     SCRIPTS: {
       LIST: '/api/scripts',
