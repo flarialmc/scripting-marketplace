@@ -19,7 +19,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-corsMiddleware wraps an http.Handler and adds CORS headers to all responses
+// corsMiddleware wraps an http.Handler and adds CORS headers to all responses
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set CORS headers for all responses
