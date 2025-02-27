@@ -19,26 +19,26 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// corsMiddleware wraps an http.Handler and adds CORS headers to all responses
-// func corsMiddleware(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		// Set CORS headers for all responses
-// 		w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins - you may want to restrict this in production
-// 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-// 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
-// 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-// 		w.Header().Set("Access-Control-Max-Age", "86400") // Cache preflight requests for 24 hours
+corsMiddleware wraps an http.Handler and adds CORS headers to all responses
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers for all responses
+		w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins - you may want to restrict this in production
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Max-Age", "86400") // Cache preflight requests for 24 hours
 
-// 		// Handle preflight requests
-// 		if r.Method == http.MethodOptions {
-// 			w.WriteHeader(http.StatusOK)
-// 			return
-// 		}
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
-// 		// Call the next handler
-// 		next.ServeHTTP(w, r)
-// 	})
-// }
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	// Configure routes
@@ -65,6 +65,7 @@ func main() {
 	// Configure server with CORS middleware
 	server := &http.Server{
 		Addr:    ":5019",
+		Handler: corsMiddleware(mux),
 	}
 
 	// Start server
