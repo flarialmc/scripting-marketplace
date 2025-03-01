@@ -6,7 +6,16 @@ export function middleware() {
   // Add CSP headers
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; connect-src 'self' https://1klcjc8um5aq.flarial.xyz; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+    [
+      "default-src 'self'",
+      "connect-src 'self' https://1klcjc8um5aq.flarial.xyz https://cloudflareinsights.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
+      "style-src 'self' 'unsafe-inline'",
+      "style-src-attr 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data:",
+      "frame-src 'self'"
+    ].join('; ')
   );
 
   // Add CORS headers
