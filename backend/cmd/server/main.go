@@ -7,9 +7,14 @@ import (
 	"strings"
 
 	"backend/internal/api/handlers/scripts"
+	"backend/internal/api/handlers/scripts"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
+	response := map[string]string{
+		"status": "healthy",
+		"server": "Flarial Scripting Marketplace",
+	}
 	response := map[string]string{
 		"status": "healthy",
 		"server": "Flarial Scripting Marketplace",

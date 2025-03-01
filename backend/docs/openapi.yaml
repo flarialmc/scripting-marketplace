@@ -12,7 +12,7 @@ paths:
   /api/scripts/{scriptId}/download:
     get:
       summary: Download a script package
-      description: Downloads a script and its associated files as a gzipped tar archive
+      description: Downloads a script and its associated files as a ZIP archive
       operationId: downloadScript
       parameters:
         - name: scriptId
@@ -29,19 +29,19 @@ paths:
             Content-Type:
               schema:
                 type: string
-                enum: [application/gzip]
+                enum: [application/x-zip-compressed]
               description: MIME type of the response
             Content-Disposition:
               schema:
                 type: string
-                pattern: '^attachment; filename=.+\.tar\.gz$'
+                pattern: '^attachment; filename=".+\.zip"$'
               description: Attachment header with the download filename
           content:
-            application/gzip:
+            application/x-zip-compressed:
               schema:
                 type: string
                 format: binary
-              description: A gzipped tar archive containing all script files
+              description: A ZIP archive containing all script files
         '400':
           description: Bad request
           content:
