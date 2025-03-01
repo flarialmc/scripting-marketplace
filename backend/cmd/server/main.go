@@ -11,8 +11,8 @@ import (
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
-		"status": "healthy",
-		"server": "Flarial Scripting Marketplace",
+	"status": "healthy",
+	"server": "Flarial Scripting Marketplace",
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -85,7 +85,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
         <div className="flex items-center justify-between mt-2">
           <div className="relative inline-flex rounded">
             <button
-              onClick={() => window.location.href = `minecraft://scripting?scriptId=${script.id}`}
+              onClick={() => window.location.href = `minecraft://flarial-scripting?scriptId=${script.id}`}
               className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-l font-medium"
               aria-label="Import script to Minecraft"
               title="Import directly into Minecraft"

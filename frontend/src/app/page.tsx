@@ -1,22 +1,51 @@
-export const dynamic = 'force-dynamic';
-
+'use client';
+import { useState, useRef, useEffect } from 'react';
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { listScripts } from '@/services/scripts';
+import { Script } from '@/types/script';
 import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
+import { FaSearch } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+export const dynamic = 'force-dynamic';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
 const flarialLogo = "/images/flarial-logo.png";
 
-export default async function Home() {
-  let scripts;
-  let error;
+export default function Home() {
+  const [scripts, setScripts] = useState<Script[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
-  try {
-    scripts = await listScripts();
-  } catch (e) {
-    error = e instanceof Error ? e.message : 'Failed to load scripts';
-  }
+  useEffect(() => {
+    async function fetchScripts() {
+      try {
+        const data = await listScripts();
+        setScripts(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load scripts');
+      }
+    }
+    fetchScripts();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const filteredScripts = scripts.filter(script => 
+    script.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div 
@@ -35,22 +64,43 @@ export default async function Home() {
           </p>
         </div>
 
+        <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+  <motion.div
+    initial={{ width: 40, height: 40 }}
+    animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+    className="relative flex items-center bg-[#201a1b]/80 rounded-lg backdrop-blur-md shadow-lg px-2"
+  >
+    <motion.input
+      type="text"
+      placeholder="Search for scripts..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className={`bg-transparent text-white focus:outline-none transition-all ${
+        isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
+      }`}
+    />
+    <button
+      onClick={() => setIsSearchOpen((prev) => !prev)}
+      className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+    >
+      <FaSearch size={18} className="text-white" />
+    </button>
+  </motion.div>
+</div>
+
+
+
         {error ? (
           <div className="p-4 rounded-lg bg-red-200 dark:bg-red-900 border border-red-400 dark:border-red-700">
             <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
           </div>
-        ) : !scripts ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse mt-12">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="w-32 h-32 rounded-lg bg-gray-200/40 dark:bg-gray-800/40 border-2 border-white shadow-lg backdrop-blur-md" />
-            ))}
-          </div>
         ) : scripts.length === 0 ? (
           <div className="text-center py-12 mt-12">
-            <p className="text-gray-600 dark:text-gray-400">No scripts available yet.</p>
+            <p className="text-gray-600 dark:text-gray-400">No matching scripts found.</p>
           </div>
         ) : (
-          <ScriptGrid scripts={scripts} />
+          <ScriptGrid scripts={filteredScripts} />
         )}
       </main>
 
