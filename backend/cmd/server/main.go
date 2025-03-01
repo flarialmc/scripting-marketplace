@@ -21,10 +21,10 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 // corsMiddleware wraps an http.Handler and adds CORS headers to all responses
 func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers for all responses
-		w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins - you may want to restrict this in production
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// Set CORS headers for all responses
+w.Header().Set("Access-Control-Allow-Origin", "https://marketplace.flarial.xyz") // Specific origin for production
+w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Max-Age", "86400") // Cache preflight requests for 24 hours
