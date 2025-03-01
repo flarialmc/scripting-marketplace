@@ -1,0 +1,7 @@
+{
+    "name": "Uptime",
+    "description": "Shows the time since Minecraft has started (use .uptm to see)",
+    "author": "Streoids",
+    "main_class": "uptm.lua",
+    "api_revision": 2
+}
