@@ -23,16 +23,24 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func corsMiddleware(next http.Handler) http.Handler {
 return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 // Set CORS headers for all responses
-w.Header().Set("Access-Control-Allow-Origin", "https://marketplace.flarial.xyz") // Specific origin for production
-w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Max-Age", "86400") // Cache preflight requests for 24 hours
+origin := r.Header.Get("Origin")
+if origin == "https://marketplace.flarial.xyz" {
+  w.Header().Set("Access-Control-Allow-Origin", origin)
+  w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+  w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+  w.Header().Set("Access-Control-Allow-Credentials", "true")
+  w.Header().Set("Access-Control-Max-Age", "86400") // Cache preflight requests for 24 hours
+  w.Header().Set("Vary", "Origin") // Important when using dynamic origin
+}
 
 		// Handle preflight requests
 		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
+		  w.Header().Set("Access-Control-Allow-Origin", "https://marketplace.flarial.xyz")
+		  w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		  w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+		  w.Header().Set("Access-Control-Max-Age", "86400")
+		  w.WriteHeader(http.StatusOK)
+		  return
 		}
 
 		// Call the next handler

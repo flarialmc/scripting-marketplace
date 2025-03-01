@@ -9,7 +9,7 @@ export async function listScripts(): Promise<Script[]> {
   try {
     const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.LIST}`, {
       cache: 'no-store',
-      mode: 'same-origin',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },
