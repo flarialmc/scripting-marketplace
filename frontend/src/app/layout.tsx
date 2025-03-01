@@ -15,7 +15,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Flarial Marketplace",
   description: "Marketplace for Flarial scripts",
+  metadataBase: new URL('https://marketplace.flarial.xyz'),
 };
+
+export async function generateHeaders() {
+  return [
+    {
+      key: 'Content-Security-Policy',
+      value: "default-src 'self'; connect-src 'self' https://1klcjc8um5aq.flarial.xyz; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+    }
+  ];
+}
 
 export default function RootLayout({
   children,
