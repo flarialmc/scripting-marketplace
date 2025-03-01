@@ -1,8 +1,8 @@
 {
     "id": "dda19a57-61ab-4e78-ace7-96cd64976011",
-    "name": "directionhud",
-    "description": "2a",
-    "author": "Author Name",
+    "name": "DirectionHUD",
+    "description": "Find directions around in your world.",
+    "author": "nikitageek",
     "version": "2.0.0",
     "main_class": "test.lua",
     "api_revision": 2,
