@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { listScripts } from '@/services/scripts';
+import { Script } from '@/types/script';
 import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
 import { FaSearch } from 'react-icons/fa';
@@ -12,11 +13,11 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', 
 const flarialLogo = "/images/flarial-logo.png";
 
 export default function Home() {
-  const [scripts, setScripts] = useState([]);
-  const [error, setError] = useState(null);
+  const [scripts, setScripts] = useState<Script[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchRef = useRef(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function fetchScripts() {
@@ -31,8 +32,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
         setIsSearchOpen(false);
       }
     }
