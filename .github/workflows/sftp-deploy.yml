@@ -21,7 +21,7 @@ jobs:
           server: node2.sear.host
           port: 2022
           password: ${{ secrets.SFTP_PASSWORD }}
-          local_path: './backend/'
+          local_path: './backend/*'
           remote_path: '.'
           sftp_only: true
           sftpArgs: '-r'
