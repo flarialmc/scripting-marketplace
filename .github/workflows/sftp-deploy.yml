@@ -3,7 +3,7 @@ name: SFTP Deploy
 on:
   push:
     branches:
-      - staging
+      - main
 
 jobs:
   deploy:
