@@ -59,8 +59,8 @@ export default function Home() {
   }, []);
 
   const filteredData = selectedOption === "Scripts"
-  ? scripts.filter(script => script.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-  : configs.filter(config => config.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+    ? scripts.filter(script => script.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    : configs.filter(config => config.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div 
@@ -72,76 +72,77 @@ export default function Home() {
         <div className="flex flex-col items-start mb-6">
           <div className="flex items-center space-x-3">
             <Image src={flarialLogo} alt="Flarial Logo" width={47} height={52} className="rounded" />
-            <h1 className="text-5xl font-extrabold tracking-tight text-white-500 leading-none">Flarial {selectedOption}</h1>
+            <h1 className="text-5xl font-extrabold tracking-tight text-white leading-none">Flarial {selectedOption}</h1>
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">
             Browse and download community-created {selectedOption.toLowerCase()} for Flarial
           </p>
 
-{/* Dropdown & Upload Configs */}
-<div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
-  {/* Dropdown Menu */}
-  <div className="relative">
-    <button
-      className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
-      onClick={() => setIsDropdownOpen(prev => !prev)}
-    >
-      {selectedOption} <FaChevronDown className="ml-2" />
-    </button>
-    {isDropdownOpen && (
-      <div className="absolute left-0 mt-2 w-48 bg-[#201a1b] rounded-md shadow-lg z-10">
-        <ul>
-          <li
-            className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
-            onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
-          >
-            Scripts
-          </li>
-          <li
-            className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
-            onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
-          >
-            Configs
-          </li>
-        </ul>
-      </div>
-    )}
-  </div>
+          {/* Dropdown & Upload Configs */}
+          <div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
+            {/* Dropdown Menu */}
+            <div className="relative">
+              <button
+                className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
+                onClick={() => setIsDropdownOpen(prev => !prev)}
+              >
+                {selectedOption} <FaChevronDown className="ml-2" />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-[#201a1b] rounded-md shadow-lg z-10">
+                  <ul>
+                    <li
+                      className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+                      onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
+                    >
+                      Scripts
+                    </li>
+                    <li
+                      className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+                      onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
+                    >
+                      Configs
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
 
-  {/* Upload Configs Button */}
-  {selectedOption === "Configs" && (
-    <button
-      onClick={() => window.location.href = '/upload-config'}
-      className="px-4 py-2 bg-[#3a2f30] text-white rounded-md shadow-md hover:bg-[#4C3F40] border border-white/20"
-    >
-      Upload Configs
-    </button>
-  )}
-</div>
+            {/* Upload Configs Button */}
+            {selectedOption === "Configs" && (
+              <button
+                onClick={() => window.location.href = '/upload-config'}
+                className="px-4 py-2 bg-[#3a2f30] text-white rounded-md shadow-md hover:bg-[#4C3F40] border border-white/20"
+              >
+                Upload Configs
+              </button>
+            )}
+          </div>
 
-        <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
-          <motion.div
-            initial={{ width: 40, height: 40 }}
-            animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="relative flex items-center bg-[#201a1b]/80 rounded-lg  shadow-lg px-2"
-          >
-            <motion.input
-              type="text"
-              placeholder={`Search for ${selectedOption.toLowerCase()}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`bg-transparent text-white focus:outline-none transition-all ${
-                isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
-              }`}
-            />
-            <button
-              onClick={() => setIsSearchOpen((prev) => !prev)}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+          <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+            <motion.div
+              initial={{ width: 40, height: 40 }}
+              animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2"
             >
-              <FaSearch size={18} className="text-white" />
-            </button>
-          </motion.div>
+              <motion.input
+                type="text"
+                placeholder={`Search for ${selectedOption.toLowerCase()}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`bg-transparent text-white focus:outline-none transition-all ${
+                  isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
+                }`}
+              />
+              <button
+                onClick={() => setIsSearchOpen((prev) => !prev)}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+              >
+                <FaSearch size={18} className="text-white" />
+              </button>
+            </motion.div>
+          </div>
         </div>
 
         {error ? (
