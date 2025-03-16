@@ -63,6 +63,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
         <img
           src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
           alt="Config Image"
+           unoptimized={true} 
           className="w-full h-full object-cover"
         />
 
@@ -76,6 +77,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
                   alt="Full Config Image"
                   width={600}
                   height={400}
+                  unoptimized={true} 
                   className="w-[600px] h-auto rounded-lg"
                 />
               </div>
