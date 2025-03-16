@@ -52,7 +52,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
   };
 
   return (
-    <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all hover:scale-[1.05] hover:z-10 shadow-md">
+    <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 transition-all hover:scale-[1.05] hover:z-10 shadow-md">
       
       {/* Config Image with Hover Preview */}
       <div 
