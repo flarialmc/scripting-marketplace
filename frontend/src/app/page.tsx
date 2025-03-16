@@ -97,7 +97,7 @@ export default function Home() {
                   </li>
                   <li
                     className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
-                    onClick={() => { setSelectedOption("Config"); setIsDropdownOpen(false); }}
+                    onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
                   >
                     Configs
                   </li>
