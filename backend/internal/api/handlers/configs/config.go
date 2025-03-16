@@ -88,6 +88,33 @@ func (h *ConfigHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// HandleListConfigs lists available configs in the directory.
+func (h *ConfigHandler) HandleListConfigs(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	entries, err := os.ReadDir(h.baseDir)
+	if err != nil {
+		log.Printf("Error reading directory: %v", err)
+		http.Error(w, "Failed to read configs directory", http.StatusInternalServerError)
+		return
+	}
+
+	var configNames []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			configNames = append(configNames, entry.Name())
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"configs": configNames,
+	})
+}
+
 // HandleDownloadConfig handles GET requests to download a config as a zip archive
 func (h *ConfigHandler) HandleDownloadConfig(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
