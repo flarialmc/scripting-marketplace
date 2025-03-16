@@ -61,7 +61,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         <img
-          src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${script.name}/icon.png`}
+          src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
           alt="Config Image"
           className="w-full h-full object-cover"
         />
@@ -72,7 +72,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
             <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
               <div className="relative bg-[#201a1b] p-4 rounded-xl shadow-lg">
                 <Image
-                  src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${script.name}/icon.png`}
+                  src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
                   alt="Full Config Image"
                   width={600}
                   height={400}
