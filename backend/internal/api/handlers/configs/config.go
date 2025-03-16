@@ -28,8 +28,23 @@ func NewConfigHandler(baseDir string) *ConfigHandler {
 	}
 }
 
-// HandleListConfigs handles GET requests to list available configs
-func (h *ConfigHandler) HandleListConfigs(w http.ResponseWriter, r *http.Request) {
+// Add a function to handle CORS preflight requests
+func (h *ConfigHandler) HandleCORS(w http.ResponseWriter, r *http.Request) {
+	// Set the necessary CORS headers for the preflight request
+	w.Header().Set("Access-Control-Allow-Origin", "*")          // Allow all origins (adjust as needed)
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS") // Allow GET, POST, and OPTIONS methods
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // Allow content type headers
+	w.Header().Set("Access-Control-Max-Age", "86400")            // Cache the CORS response for a day
+
+	// If it's a preflight request, respond with a 200 status
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+}
+
+// HandleListScripts handles GET requests to list available scripts
+func (h *ConfigHandler) HandleListScripts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
