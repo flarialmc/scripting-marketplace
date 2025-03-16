@@ -60,7 +60,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <img
+        <Image
           src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
           alt="Config Image"
            unoptimized={true} 
