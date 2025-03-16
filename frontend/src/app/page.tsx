@@ -99,7 +99,7 @@ export default function Home() {
                     className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
                     onClick={() => { setSelectedOption("Config"); setIsDropdownOpen(false); }}
                   >
-                    Config
+                    Configs
                   </li>
                 </ul>
               </div>
