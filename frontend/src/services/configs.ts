@@ -9,7 +9,7 @@ export async function listConfigs(): Promise<Config[]> {
   try {
     const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CONFIGS.LIST}`, {
       cache: 'no-store',
-      mode: 'same-origin',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },
