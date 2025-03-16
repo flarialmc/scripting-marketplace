@@ -33,43 +33,8 @@ export default function Home() {
           const data = await listScripts();
           setScripts(data);
         } else {
-          // Dummy configs with all required fields
-          const dummyConfigs: Config[] = [
-            { 
-              id: "1", 
-              name: "Better Red", 
-              description: "Flarial Config with better red colors.", 
-              author: "parkerthedripper", 
-              imageUrl: "https://i.imgur.com/EJZLgwt.png", // Replace with actual image
-              version: "1.0", 
-              downloadUrl: "#", 
-              createdAt: new Date().toISOString(), 
-              updatedAt: new Date().toISOString() 
-            },
-            { 
-              id: "2", 
-              name: "DarkUI", 
-              description: "A dark themed UI config.", 
-              author: "MBG1337", 
-              imageUrl: "https://i.imgur.com/Cf3uXYL.png", 
-              version: "1.1", 
-              downloadUrl: "#", 
-              createdAt: new Date().toISOString(), 
-              updatedAt: new Date().toISOString() 
-            },
-            { 
-              id: "3", 
-              name: "Black and Gold", 
-              description: "A black and gold themed config.", 
-              author: "xcizzzzz", 
-              imageUrl: "https://i.imgur.com/Brmgwr4.png", 
-              version: "2.0", 
-              downloadUrl: "#", 
-              createdAt: new Date().toISOString(), 
-              updatedAt: new Date().toISOString() 
-            }
-          ];
-          setConfigs(dummyConfigs);
+          const data = await listConfigs();
+          setConfigs(data);
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load data');
@@ -77,7 +42,6 @@ export default function Home() {
     }
     fetchData();
   }, [selectedOption]);
-  
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
