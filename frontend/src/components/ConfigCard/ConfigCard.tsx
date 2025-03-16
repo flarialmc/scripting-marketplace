@@ -54,7 +54,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
     <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all hover:scale-[1.05] hover:z-10 shadow-md">
       {/* Config Image */}
       <div className="relative w-full h-40 bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden">
-        <Image src={config.imageUrl} alt="Config Image" layout="fill" objectFit="cover" />
+    <Image src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`} alt="Config Image" width={200} height={200} />
       </div>
       
       {/* Config Info */}
