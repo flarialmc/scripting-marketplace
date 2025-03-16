@@ -59,15 +59,15 @@ export default function Home() {
   }, []);
 
   const filteredData = selectedOption === "Scripts"
-    ? scripts.filter(script => script.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : configs.filter(config => config.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  ? scripts.filter(script => script.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+  : configs.filter(config => config.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div 
       className={`min-h-screen relative overflow-hidden ${spaceGrotesk.className}`}
       style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-lg"></div>
+      <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
       <main className="relative max-w-7xl mx-auto p-6 md:p-12">
         <div className="flex flex-col items-start mb-6">
           <div className="flex items-center space-x-3">
@@ -112,7 +112,7 @@ export default function Home() {
             initial={{ width: 40, height: 40 }}
             animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="relative flex items-center bg-[#201a1b]/80 rounded-lg backdrop-blur-md shadow-lg px-2"
+            className="relative flex items-center bg-[#201a1b]/80 rounded-lg  shadow-lg px-2"
           >
             <motion.input
               type="text"
