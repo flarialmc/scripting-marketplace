@@ -1,0 +1,11 @@
+{
+  "id": "darkui",
+  "name": "Dark UI",
+  "description": "A sleek dark-themed UI configuration.",
+  "version": "1.0.0",
+  "author": "YourName",
+  "downloadUrl": "http://localhost:5019/api/configs/darkui/download",
+  "createdAt": "2025-03-16T12:00:00Z",
+  "updatedAt": "2025-03-16T12:30:00Z",
+  "imageUrl": "https://i.imgur.com/Cf3uXYL.png"
+}
