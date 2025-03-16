@@ -81,22 +81,22 @@ export default function Home() {
           {/* Dropdown Menu */}
           <div className="relative mt-2" ref={dropdownRef}>
             <button
-              className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md shadow-md hover:bg-gray-700"
+              className="flex items-center px-4 py-2 bg-bg-[#201a1b]/80  text-white rounded-md shadow-md hover:bg-gray-700"
               onClick={() => setIsDropdownOpen(prev => !prev)}
             >
               {selectedOption} <FaChevronDown className="ml-2" />
             </button>
             {isDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10">
+              <div className="absolute left-0 mt-2 w-48 bg-[#201a1b]/80  rounded-md shadow-lg z-10">
                 <ul>
                   <li
-                    className="px-4 py-2 hover:bg-gray-700 text-white cursor-pointer"
+                    className="px-4 py-2 hover:bg-[#201a1b]/60 text-white cursor-pointer"
                     onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
                   >
                     Scripts
                   </li>
                   <li
-                    className="px-4 py-2 hover:bg-gray-700 text-white cursor-pointer"
+                    className="px-4 py-2 hover:bg-[#201a1b]/60 text-white cursor-pointer"
                     onClick={() => { setSelectedOption("Config"); setIsDropdownOpen(false); }}
                   >
                     Config
