@@ -58,9 +58,14 @@ export default function Home() {
     };
   }, []);
 
-  const filteredData = selectedOption === "Scripts"
-    ? scripts.filter(script => script.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-    : configs.filter(config => config.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Filter scripts and configs separately
+  const filteredScripts = scripts.filter(script => 
+    script.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredConfigs = configs.filter(config => 
+    config.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div 
@@ -149,14 +154,22 @@ export default function Home() {
           <div className="p-4 rounded-lg bg-red-200 dark:bg-red-900 border border-red-400 dark:border-red-700">
             <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
           </div>
-        ) : filteredData.length === 0 ? (
-          <div className="text-center py-12 mt-12">
-            <p className="text-gray-600 dark:text-gray-400">No matching {selectedOption.toLowerCase()} found.</p>
-          </div>
         ) : selectedOption === "Scripts" ? (
-          <ScriptGrid scripts={filteredData} />
+          filteredScripts.length > 0 ? (
+            <ScriptGrid scripts={filteredScripts} />
+          ) : (
+            <div className="text-center py-12 mt-12">
+              <p className="text-gray-600 dark:text-gray-400">No matching scripts found.</p>
+            </div>
+          )
         ) : (
-          <ConfigGrid configs={filteredData} />
+          filteredConfigs.length > 0 ? (
+            <ConfigGrid configs={filteredConfigs} />
+          ) : (
+            <div className="text-center py-12 mt-12">
+              <p className="text-gray-600 dark:text-gray-400">No matching configs found.</p>
+            </div>
+          )
         )}
       </main>
     </div>
