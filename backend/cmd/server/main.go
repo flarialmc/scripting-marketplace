@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -52,7 +51,8 @@ func main() {
 
 	scriptHandler := scripts.NewScriptHandler("scripts")
 	configHandler := configs.NewConfigHandler("configs")
-
+    
+    mux.HandleFunc("/api/configs", configHandler.HandleListConfigs)
 	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/api/scripts", scriptHandler.HandleListScripts)
 	mux.HandleFunc("/api/scripts/", func(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +74,7 @@ func main() {
 			http.NotFound(w, r)
 		}
 	})
-
+    
 	server := &http.Server{
 		Addr:    ":5019",
 		Handler: corsMiddleware(mux),
