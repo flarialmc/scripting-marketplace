@@ -12,26 +12,6 @@ interface ConfigCardProps {
 }
 
 export function ConfigCard({ config }: ConfigCardProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        buttonRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleDownload = async () => {
     try {
       const response = await getConfigDownloadResponse(config.id);
@@ -44,7 +24,6 @@ export function ConfigCard({ config }: ConfigCardProps) {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      setIsDropdownOpen(false);
     } catch (error) {
       console.error('Error downloading config:', error);
     }
@@ -54,17 +33,15 @@ export function ConfigCard({ config }: ConfigCardProps) {
     <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 backdrop-blur-md transition-all hover:scale-[1.05] hover:z-10 shadow-md">
       {/* Config Image */}
       <div className="relative w-full h-40 bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden">
-      <img
-  src={config.imageUrl}
-  alt="Config Image"
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  }}
-/>
-
-
+        <img
+          src={config.imageUrl}
+          alt="Config Image"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
       </div>
       
       {/* Config Info */}
@@ -75,8 +52,8 @@ export function ConfigCard({ config }: ConfigCardProps) {
           <p>Uploaded: {new Date(config.createdAt).toLocaleDateString()}</p>
         </div>
         
-         {/* Download & Import Buttons */}
-         <div className="flex flex-col gap-2">
+        {/* Download & Import Buttons */}
+        <div className="flex flex-col gap-2">
           <button
             onClick={handleDownload}
             className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-md font-medium"
@@ -85,19 +62,17 @@ export function ConfigCard({ config }: ConfigCardProps) {
             Download
           </button>
 
-  {/* Import to Minecraft Button */}
-  <button
-    onClick={() => window.location.href = `minecraft://flarial-configs?configName=${config.name}`}
-    className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-md font-medium"
-    aria-label="Import config to Minecraft"
-    title="Import directly into Minecraft"
-  >
-    <FontAwesomeIcon icon={faDownload} className="text-white" />
-    Import
-  </button>
-</div>
+          <button
+            onClick={() => window.location.href = `minecraft://flarial-configs?configName=${config.name}`}
+            className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-md font-medium"
+            aria-label="Import config to Minecraft"
+            title="Import directly into Minecraft"
+          >
+            <FontAwesomeIcon icon={faDownload} className="text-white" />
+            Import
+          </button>
         </div>
       </div>
+    </div>
   );
 }
-// Compare this snippet from ConfigCard.tsx:
