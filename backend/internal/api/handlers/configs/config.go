@@ -102,16 +102,37 @@ func (h *ConfigHandler) HandleListConfigs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var configNames []string
+	var configs []map[string]interface{}
 	for _, entry := range entries {
-		if entry.IsDir() {
-			configNames = append(configNames, entry.Name())
+		if !entry.IsDir() {
+			continue
 		}
+
+		metadataPath := filepath.Join(h.baseDir, entry.Name(), "main.json")
+		metadata, err := os.ReadFile(metadataPath)
+		if err != nil {
+			log.Printf("Warning: Missing or unreadable metadata file for %s: %v", entry.Name(), err)
+			continue
+		}
+
+		var configInfo map[string]interface{}
+		if err := json.Unmarshal(metadata, &configInfo); err != nil {
+			log.Printf("Warning: Invalid JSON in metadata file for %s: %v", entry.Name(), err)
+			continue
+		}
+
+		// Ensure essential fields exist
+		if _, ok := configInfo["name"]; !ok {
+			configInfo["name"] = entry.Name() // Default to folder name if missing
+		}
+		configInfo["id"] = entry.Name()
+
+		configs = append(configs, configInfo)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"configs": configNames,
+		"configs": configs,
 	})
 }
 
