@@ -1,16 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    domains: ["i.imgur.com"], // Allow Imgur images
-  },
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: '/(.*)', // Apply to all routes
         headers: [
           {
-            key: "Content-Security-Policy",
-            value: "default-src 'self' http://localhost:5019; script-src 'self'; object-src 'none'; frame-ancestors 'none';",
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; connect-src 'self' https://1klcjc8um5aq.flarial.xyz https://cloudflareinsights.com https://discord.com;",
           },
         ],
       },
@@ -18,4 +15,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
