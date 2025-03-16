@@ -78,34 +78,46 @@ export default function Home() {
             Browse and download community-created {selectedOption.toLowerCase()} for Flarial
           </p>
 
-          {/* Dropdown Menu */}
-          <div className="relative mt-2" ref={dropdownRef}>
-            <button
-              className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
-              onClick={() => setIsDropdownOpen(prev => !prev)}
-            >
-              {selectedOption} <FaChevronDown className="ml-2" />
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-48 bg-[#201a1b] rounded-md shadow-lg z-10">
-                <ul>
-                  <li
-                    className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
-                    onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
-                  >
-                    Scripts
-                  </li>
-                  <li
-                    className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
-                    onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
-                  >
-                    Configs
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
+{/* Dropdown & Upload Configs */}
+<div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
+  {/* Dropdown Menu */}
+  <div className="relative">
+    <button
+      className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
+      onClick={() => setIsDropdownOpen(prev => !prev)}
+    >
+      {selectedOption} <FaChevronDown className="ml-2" />
+    </button>
+    {isDropdownOpen && (
+      <div className="absolute left-0 mt-2 w-48 bg-[#201a1b] rounded-md shadow-lg z-10">
+        <ul>
+          <li
+            className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+            onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
+          >
+            Scripts
+          </li>
+          <li
+            className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+            onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
+          >
+            Configs
+          </li>
+        </ul>
+      </div>
+    )}
+  </div>
+
+  {/* Upload Configs Button */}
+  {selectedOption === "Configs" && (
+    <button
+      onClick={() => window.location.href = '/upload-config'}
+      className="px-4 py-2 bg-[#3a2f30] text-white rounded-md shadow-md hover:bg-[#4C3F40] border border-white/20"
+    >
+      Upload Configs
+    </button>
+  )}
+</div>
 
         <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
           <motion.div
