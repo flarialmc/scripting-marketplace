@@ -68,9 +68,15 @@ func main() {
 	})
 
 	mux.HandleFunc("/api/configs/", func(w http.ResponseWriter, r *http.Request) {
-		if len(r.URL.Path) > len("/api/configs/") && strings.HasSuffix(r.URL.Path, "/download") {
+		path := strings.TrimPrefix(r.URL.Path, "/api/configs/")
+	
+		switch {
+		case strings.HasSuffix(path, "/download"):
 			configHandler.HandleDownloadConfig(w, r)
-		} else {
+		case strings.HasSuffix(path, "/icon.png"):
+			imagePath := fmt.Sprintf("configs/%s/icon.png", strings.TrimSuffix(path, "/icon.png"))
+			http.ServeFile(w, r, imagePath)
+		default:
 			http.NotFound(w, r)
 		}
 	})
