@@ -10,6 +10,8 @@ import Image from 'next/image';
 import { Space_Grotesk } from 'next/font/google';
 import { FaSearch, FaChevronDown } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+
 export const dynamic = 'force-dynamic';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
@@ -25,6 +27,7 @@ export default function Home() {
   const [selectedOption, setSelectedOption] = useState("Scripts");
   const searchRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -58,7 +61,6 @@ export default function Home() {
     };
   }, []);
 
-  // Filter scripts and configs separately
   const filteredScripts = scripts.filter(script => 
     script.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -115,11 +117,11 @@ export default function Home() {
 
             {/* Upload Configs Button */}
             {selectedOption === "Configs" && (
-              <button
-                onClick={() => window.location.href = '/upload-config'}
-                className="px-4 py-2 bg-[#3a2f30] text-white rounded-md shadow-md hover:bg-[#4C3F40] border border-white/20"
+              <button 
+                onClick={() => router.push('/upload-config')} 
+                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
               >
-                Upload Configs
+                Upload Config
               </button>
             )}
           </div>
