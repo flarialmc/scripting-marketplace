@@ -7,4 +7,5 @@ export interface Script {
   downloadUrl: string;
   createdAt: string;
   updatedAt: string;
+  imageUrl:string;
 }
