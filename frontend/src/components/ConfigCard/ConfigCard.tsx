@@ -41,7 +41,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         <Image
-          src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.name}/icon.png`}
+          src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
           alt="Config Image"
           unoptimized={true} 
           className="w-full h-full object-cover"
