@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions, TokenSet, Session } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import { getToken } from "next-auth/jwt";
+import { JWT } from "next-auth/jwt";
 
 // Store to track user uploads with timestamps
 const userUploadTracker = new Map<string, number>(); // Key: userId, Value: timestamp (ms)
@@ -12,7 +13,7 @@ const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
 const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your server ID
 
 // NextAuth configuration
-const authOptions = {
+const authOptions: AuthOptions = {
   providers: [
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID,
@@ -22,16 +23,16 @@ const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account }: any) {
+    async jwt({ token, account }: { token: JWT; account: TokenSet | null }) {
       if (account) {
         token.accessToken = account.access_token;
         token.id = account.providerAccountId;
       }
       return token;
     },
-    async session({ session, token }: any) {
-      session.accessToken = token.accessToken;
-      session.user.id = token.id;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      session.accessToken = token.accessToken as string;
+      session.user.id = token.id as string;
       return session;
     },
   },
@@ -40,13 +41,18 @@ const authOptions = {
 // Initialize NextAuth handler (not exported, used internally)
 const authHandler = NextAuth(authOptions);
 
+interface Guild {
+  id: string;
+  name: string;
+}
+
 async function checkDiscordMembership(accessToken: string): Promise<boolean> {
   const response = await fetch('https://discord.com/api/users/@me/guilds', {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!response.ok) return false;
-  const guilds = await response.json();
-  return guilds.some((guild: any) => guild.id === FLARIAL_DISCORD_ID);
+  const guilds: Guild[] = await response.json();
+  return guilds.some(guild => guild.id === FLARIAL_DISCORD_ID);
 }
 
 export async function POST(request: NextRequest) {
@@ -145,7 +151,7 @@ export async function POST(request: NextRequest) {
         id: configData.id,
         name: configData.name,
         version: configData.version,
-        author: token.name || "Unknown", // Use Discord username from token
+        author: token.name || "Unknown",
         createdAt: new Date().toISOString(),
       }, null, 2)], 'manifest.json', { type: 'application/json' }),
     ];
@@ -221,4 +227,4 @@ export async function POST(request: NextRequest) {
 
 // Export the auth handler for GET and POST (for auth routes)
 export const GET = authHandler;
-export const POST_AUTH = authHandler; // Rename to avoid conflict with POST export
+export const POST_AUTH = authHandler;
