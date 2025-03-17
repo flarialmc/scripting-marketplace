@@ -114,17 +114,19 @@ export async function POST(request: NextRequest) {
     const treeItems = [];
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
-      // Place files directly under backend/configs/{folderName}/
-      const filePaths = uploadedFiles.map(file => {
-         const parts = file.webkitRelativePath.split('/');
-       parts.splice(1, 1); // Remove the second element (top-level folder)
-       return parts.join('/');
-              console.log(`Staging file: ${filePath}`);
+const filePaths = uploadedFiles.map(file => {
+  const parts = file.webkitRelativePath.split('/');
+  parts.splice(1, 1); // Remove the second element (top-level folder)
+  return parts.join('/');
+});
+
+      console.log(`Staging file: ${filePath}`);
+      
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ content: fileContent, encoding: 'base64' }),
-       });
+      });
       if (!blobResponse.ok) throw new Error(`Failed to create blob: ${await blobResponse.text()}`);
       const blobData = await blobResponse.json();
       treeItems.push({ path: filePath, mode: '100644', type: 'blob', sha: blobData.sha });
