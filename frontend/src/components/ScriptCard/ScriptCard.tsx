@@ -41,10 +41,10 @@ export function ScriptCard({ script }: ScriptCardProps) {
     try {
       const response = await getScriptDownloadResponse(script.id);
       
-      // Get filename from Content-Disposition header or fallback
+      // Get filename from Content-Disposition header or fallback to script name with .lua extension
       const contentDisposition = response.headers.get('content-disposition');
-      const filenameMatch = contentDisposition?.match(/filename="?([^"]+\.zip)"?/) || [];
-      const filename = filenameMatch[1] || `${script.name}.zip`;
+      const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/) || [];
+      const filename = filenameMatch[1] || `${script.name}.lua`;
       
       // Create blob from response and trigger download
       const blob = await response.blob();
@@ -64,8 +64,6 @@ export function ScriptCard({ script }: ScriptCardProps) {
       // TODO: Add user-facing error notification
     }
   };
-  
-  
 
   return (
     <div className="group relative p-6 rounded-lg bg-[#201a1b]/80 transition-all duration-300 ease-in-out scale-100 hover:scale-[1.05] hover:z-10 hover:shadow-red-950 shadow-md">
@@ -75,9 +73,6 @@ export function ScriptCard({ script }: ScriptCardProps) {
             <h2 className="text-lg font-semibold mb-1 text-gray-300">{script.name}</h2>
             <p className="text-sm text-gray-400">by {script.author}</p>
           </div>
-          <span className="text-xs px-2 py-1 rounded-full bg-black/10 text-gray-300">
-            v{script.version}
-          </span>
         </div>
 
         <p className="text-sm text-gray-300">{script.description}</p>
@@ -85,7 +80,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
         <div className="flex items-center justify-between mt-2">
           <div className="relative inline-flex rounded">
             <button
-              onClick={() => window.location.href = `minecraft://flarial-scripting?scriptId=${script.id}`}
+              onClick={() => window.location.href = `minecraft://flarial-scripting?scriptName=${script.name}`}
               className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-l font-medium"
               aria-label="Import script to Minecraft"
               title="Import directly into Minecraft"
@@ -98,7 +93,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
             <button
               ref={buttonRef}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center px-3 py-2 bg-[#3a2f30] text-white hover:bg-[#4C3F40] transition-all duration-200 rounded-r font-medium "
+              className="flex items-center px-3 py-2 bg-[#3a2f30] text-white hover:bg-[#4C3F40] transition-all duration-200 rounded-r font-medium"
               aria-label="Show download options"
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
@@ -122,14 +117,11 @@ export function ScriptCard({ script }: ScriptCardProps) {
                   className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-black/10 transition-colors"
                   role="menuitem"
                 >
-                  Download ZIP
+                  Download
                 </button>
               </div>
             )}
           </div>
-          <span className="text-xs text-gray-400">
-            Updated {new Date(script.updatedAt).toLocaleDateString()}
-          </span>
         </div>
       </div>
     </div>
