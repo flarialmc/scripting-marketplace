@@ -31,8 +31,8 @@ function ConfigUploadInner() {
   });
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [iconPreview, setIconPreview] = useState<string | null>(null);
-
   useEffect(() => {
     if (session?.user?.name) {
       setFormData(prev => ({ ...prev, author: session.user.name }));
