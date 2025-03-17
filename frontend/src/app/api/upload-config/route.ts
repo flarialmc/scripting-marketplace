@@ -1,121 +1,76 @@
+'use client';
+
 import { NextRequest, NextResponse } from 'next/server';
-import NextAuth, { AuthOptions, TokenSet, Session } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
-import { getToken } from "next-auth/jwt";
-import { JWT } from "next-auth/jwt";
 
 // Store to track user uploads with timestamps
-const userUploadTracker = new Map<string, number>(); // Key: userId, Value: timestamp (ms)
+const userUploadTracker = new Map<string, number>(); // Key: identifier, Value: timestamp (ms)
 const processingRequests = new Set<string>();
 
 // Time limit: 24 hours in milliseconds
-const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
-const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your server ID
+const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000; // Adjust for testing (e.g., 1 * 60 * 1000 for 1 minute)
 
-// NextAuth configuration
-const authOptions: AuthOptions = {
-  providers: [
-    DiscordProvider({
-      clientId: process.env.DISCORD_CLIENT_ID,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET,
-      authorization: { params: { scope: "identify guilds" } },
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    async jwt({ token, account }: { token: JWT; account: TokenSet | null }) {
-      if (account) {
-        token.accessToken = account.access_token;
-        token.id = account.providerAccountId;
-      }
-      return token;
-    },
-    async session({ session, token }: { session: Session; token: JWT }) {
-      session.accessToken = token.accessToken as string;
-      session.user.id = token.id as string;
-      return session;
-    },
-  },
-};
-
-// Initialize NextAuth handler (not exported, used internally)
-const authHandler = NextAuth(authOptions);
-
-interface Guild {
-  id: string;
-  name: string;
-}
-
-async function checkDiscordMembership(accessToken: string): Promise<boolean> {
-  const response = await fetch('https://discord.com/api/users/@me/guilds', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!response.ok) return false;
-  const guilds: Guild[] = await response.json();
-  return guilds.some(guild => guild.id === FLARIAL_DISCORD_ID);
+// Helper to get unique user identifier
+function getUserIdentifier(request: NextRequest): string {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
+  const cookies = request.cookies;
+  const cookieId = cookies.get('user_id')?.value || `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+  return `${ip}-${cookieId}`;
 }
 
 export async function POST(request: NextRequest) {
-  // Get session token manually
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-
-  // Step 1: Check authentication
-  if (!token || !token.accessToken || !token.id) {
-    return NextResponse.json({ error: "Unauthorized. Please sign in with Discord." }, { status: 401 });
-  }
-
-  // Step 2: Check Discord membership
-  const isMember = await checkDiscordMembership(token.accessToken as string);
-  if (!isMember) {
-    return NextResponse.json(
-      { error: "You must be a member of the Flarial Discord server to upload." },
-      { status: 403 }
-    );
-  }
-
-  // Step 3: Use user ID from token
-  const userId = token.id as string;
-  
-  // Step 4: Check cooldown
-  const lastUploadTime = userUploadTracker.get(userId);
-  const currentTime = Date.now();
-
-  if (lastUploadTime) {
-    const timeSinceLastUpload = currentTime - lastUploadTime;
-    if (timeSinceLastUpload < UPLOAD_COOLDOWN) {
-      const remainingTime = Math.ceil((UPLOAD_COOLDOWN - timeSinceLastUpload) / (60 * 1000));
-      return NextResponse.json(
-        { error: `Upload limit reached. Please wait ${remainingTime} minutes before uploading again.` },
-        { status: 403 }
-      );
-    }
-  }
-
-  // Step 5: Parse request data
   try {
+    // Step 1: Identify the user and check cooldown
+    const userIdentifier = getUserIdentifier(request);
+    console.log(`User identifier: ${userIdentifier}`);
+
+    const lastUploadTime = userUploadTracker.get(userIdentifier);
+    const currentTime = Date.now();
+    
+    if (lastUploadTime) {
+      const timeSinceLastUpload = currentTime - lastUploadTime;
+      console.log(`Last upload time: ${lastUploadTime}, Time since: ${timeSinceLastUpload}ms`);
+      
+      if (timeSinceLastUpload < UPLOAD_COOLDOWN) {
+        const remainingTime = Math.ceil((UPLOAD_COOLDOWN - timeSinceLastUpload) / (60 * 1000)); // in minutes
+        console.log(`Cooldown active. Remaining time: ${remainingTime} minutes`);
+        return NextResponse.json(
+          { error: `Upload limit reached. Please wait ${remainingTime} minutes before uploading again.` },
+          { status: 403 }
+        );
+      } else {
+        console.log('Cooldown expired, allowing new upload');
+      }
+    } else {
+      console.log('No previous upload found for this user');
+    }
+
+    // Step 2: Parse request data
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
     const configData = JSON.parse(formData.get('configData') as string);
 
-    // Step 6: Determine folder name
+    // Step 3: Determine folder name (used as the config folder)
     let folderName = '';
-    const mainJsonFile = files.find(f => f.name.toLowerCase() === 'main.json');
+    const mainJsonFile = files.find(f => f.name === 'main.json');
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
+      // Use configData.id or configData.name as the folder name, falling back to timestamp
       folderName = configData.id?.trim() || configData.name?.trim() || mainJson.name?.trim() || `config-${Date.now()}`;
     } else {
       folderName = configData.id?.trim() || configData.name?.trim() || `config-${Date.now()}`;
     }
     if (!folderName) throw new Error('Invalid folder name');
+    console.log(`Folder name: ${folderName}`);
 
-    // Step 7: Check for duplicate processing
+    // Step 4: Check for duplicate processing
     if (processingRequests.has(folderName)) {
+      console.log(`Duplicate upload detected for folder: ${folderName}`);
       return NextResponse.json({ error: 'Upload already in progress' }, { status: 429 });
     }
     processingRequests.add(folderName);
 
-    // Step 8: GitHub setup
+    // Step 5: GitHub setup
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) throw new Error('GitHub token not configured');
 
@@ -130,28 +85,30 @@ export async function POST(request: NextRequest) {
       'Content-Type': 'application/json',
     };
 
-    // Step 9: Get the latest commit SHA
+    // Step 6: Get the latest commit SHA
     const refResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/ref/heads/${baseBranch}`, { headers });
     if (!refResponse.ok) throw new Error(`Failed to get base branch ref: ${await refResponse.text()}`);
     const refData = await refResponse.json();
     const baseSha = refData.object.sha;
+    console.log(`Base SHA: ${baseSha}`);
 
-    // Step 10: Create a new branch
+    // Step 7: Create a new branch
     const createBranchResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ ref: `refs/heads/${newBranch}`, sha: baseSha }),
     });
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
+    console.log(`Branch created: ${newBranch}`);
 
-    // Step 11: Prepare files for commit
+    // Step 8: Prepare files for commit (including auto-generated manifest if needed)
     const updatedFiles = mainJsonFile ? files : [
       ...files,
       new File([JSON.stringify({
         id: configData.id,
         name: configData.name,
         version: configData.version,
-        author: token.name || "Unknown",
+        author: configData.author,
         createdAt: new Date().toISOString(),
       }, null, 2)], 'manifest.json', { type: 'application/json' }),
     ];
@@ -159,8 +116,10 @@ export async function POST(request: NextRequest) {
     const treeItems = [];
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
+      // Extract just the base filename, removing any folder structure (e.g., "MBG_TEST/file.txt" -> "file.txt")
       const baseFileName = file.name.split('/').pop() || file.name;
       const filePath = `backend/configs/${folderName}/${baseFileName}`;
+      console.log(`Staging file: ${filePath}`);
       
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
         method: 'POST',
@@ -172,7 +131,7 @@ export async function POST(request: NextRequest) {
       treeItems.push({ path: filePath, mode: '100644', type: 'blob', sha: blobData.sha });
     }
 
-    // Step 12: Create new tree and commit
+    // Step 9: Create new tree and commit
     const treeResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/trees`, {
       method: 'POST',
       headers,
@@ -184,12 +143,12 @@ export async function POST(request: NextRequest) {
     const commitResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/commits`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ message: `Add ${folderName} configuration by ${token.name}`, tree: treeData.sha, parents: [baseSha] }),
+      body: JSON.stringify({ message: `Add ${folderName} configuration`, tree: treeData.sha, parents: [baseSha] }),
     });
     if (!commitResponse.ok) throw new Error(`Failed to create commit: ${await commitResponse.text()}`);
     const commitData = await commitResponse.json();
 
-    // Step 13: Update branch reference
+    // Step 10: Update branch reference
     const updateRefResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs/heads/${newBranch}`, {
       method: 'PATCH',
       headers,
@@ -197,23 +156,31 @@ export async function POST(request: NextRequest) {
     });
     if (!updateRefResponse.ok) throw new Error(`Failed to update branch ref: ${await updateRefResponse.text()}`);
 
-    // Step 14: Create pull request
+    // Step 11: Create pull request
     const prResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/pulls`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        title: `Add config: ${folderName} by ${token.name}`,
+        title: `Add config: ${folderName}`,
         head: newBranch,
         base: baseBranch,
-        body: `This PR adds the ${folderName} configuration to backend/configs/. Submitted by ${token.name}.`,
+        body: `This PR adds the ${folderName} configuration to backend/configs/. Please review and merge.`,
       }),
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
+    console.log('Pull request created successfully');
 
-    // Step 15: Record upload timestamp
-    userUploadTracker.set(userId, currentTime);
+    // Step 12: Record upload timestamp
+    userUploadTracker.set(userIdentifier, currentTime);
+    console.log(`Upload recorded for ${userIdentifier} at ${currentTime}`);
 
-    return NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });
+    // Step 13: Set cookie and return response
+    const response = NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });
+    if (!request.cookies.get('user_id')) {
+      response.cookies.set('user_id', userIdentifier.split('-')[1], { httpOnly: true, maxAge: 60 * 60 * 24 * 365 });
+    }
+
+    return response;
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
@@ -222,9 +189,6 @@ export async function POST(request: NextRequest) {
     );
   } finally {
     processingRequests.clear();
+    console.log('Processing requests cleared');
   }
 }
-
-// Export the auth handler for GET and POST (for auth routes)
-export const GET = authHandler;
-export const POST_AUTH = authHandler;
