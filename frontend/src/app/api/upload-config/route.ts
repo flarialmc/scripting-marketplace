@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
-      // Use configData.id as the folder name if available, otherwise fallback to name or timestamp
+      // Use configData.id as the folder name, falling back to name or timestamp
       folderName = configData.id?.trim() || mainJson.name?.trim() || configData.name?.trim() || `config-${Date.now()}`;
     } else {
       folderName = configData.id?.trim() || configData.name?.trim() || `config-${Date.now()}`;
