@@ -1,0 +1,238 @@
+[
+    {
+        "name": "rounding",
+        "value": 11.000015258789063
+    },
+    {
+        "name": "border",
+        "value": true
+    },
+    {
+        "name": "percentageX",
+        "value": 0.049669522792100906
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "cps",
+        "value": false
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "enabledColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "enabledRGB",
+        "value": false
+    },
+    {
+        "name": "spacebarHeight",
+        "value": 0.09000034630298615
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textscale",
+        "value": 7.688301086425781
+    },
+    {
+        "name": "enabledRGBSpeed",
+        "value": 1.0
+    },
+    {
+        "name": "textEnabledColor",
+        "value": "b30000"
+    },
+    {
+        "name": "textEnabledRGB",
+        "value": false
+    },
+    {
+        "name": "textEnabledRGBSpeed",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "enabledOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textEnabledOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "uiscale",
+        "value": 1.0000003576278687
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "textscale2",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "sText",
+        "value": "S"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "lmbrmb",
+        "value": true
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "lmbtext",
+        "value": "{value} CPS"
+    },
+    {
+        "name": "hidecps",
+        "value": true
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "rmbtext",
+        "value": "{value} CPS"
+    },
+    {
+        "name": "wText",
+        "value": "W"
+    },
+    {
+        "name": "aText",
+        "value": "A"
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "dText",
+        "value": "D"
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "spacebarWidth",
+        "value": 0.5
+    },
+    {
+        "name": "keySpacing",
+        "value": 1.6300040483474731
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "textColor",
+        "value": "d30000"
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    }
+]
