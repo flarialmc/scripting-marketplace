@@ -1,0 +1,122 @@
+[
+    {
+        "name": "24",
+        "value": false
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "text",
+        "value": "{value}"
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 1.0
+    },
+    {
+        "name": "textscale",
+        "value": 0.7999994158744812
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "percentageX",
+        "value": 1.0
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "pady",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "rectwidth",
+        "value": 0.9999995827674866
+    },
+    {
+        "name": "rectheight",
+        "value": 0.9999995827674866
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "rounding",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "textColor",
+        "value": "9d00ff"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6499996781349182
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    }
+]
