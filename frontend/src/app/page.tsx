@@ -115,17 +115,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* Upload Configs Button */}
-            {selectedOption === "Configs" && (
-              <button 
-                onClick={() => router.push('/upload-config')} 
-                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
-              >
-                Upload Config
-              </button>
-            )}
-          </div>
-
           <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
             <motion.div
               initial={{ width: 40, height: 40 }}
