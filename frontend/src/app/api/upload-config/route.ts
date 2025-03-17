@@ -53,9 +53,10 @@ export async function POST(request: NextRequest) {
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
-      folderName = mainJson.name?.trim() || configData.name?.trim() || `config-${Date.now()}`;
+      // Use configData.id as the folder name if available, otherwise fallback to name or timestamp
+      folderName = configData.id?.trim() || mainJson.name?.trim() || configData.name?.trim() || `config-${Date.now()}`;
     } else {
-      folderName = configData.name?.trim() || `config-${Date.now()}`;
+      folderName = configData.id?.trim() || configData.name?.trim() || `config-${Date.now()}`;
     }
     if (!folderName) throw new Error('Invalid folder name');
     console.log(`Folder name: ${folderName}`);
@@ -113,7 +114,8 @@ export async function POST(request: NextRequest) {
     const treeItems = [];
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
-      const filePath = `backend/configs/${folderName}/${file.name}`; // Place files directly under folderName
+      // Place files directly under backend/configs/{folderName}/
+      const filePath = `backend/configs/${folderName}/${file.name}`;
       console.log(`Staging file: ${filePath}`);
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
         method: 'POST',
