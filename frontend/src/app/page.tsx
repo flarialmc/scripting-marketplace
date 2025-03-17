@@ -38,7 +38,7 @@ const SearchBar = memo(({ searchQuery, setSearchQuery, isSearchOpen, setIsSearch
         style={{
           width: isSearchOpen ? '250px' : '40px',
           willChange: 'width',
-          transform: 'translateZ(0)', // Force GPU acceleration
+          transform: 'translateZ(0)',
         }}
       >
         <input
@@ -110,7 +110,7 @@ export default function Home() {
     if (!isLoading) {
       fetchData();
     }
-  }, [selectedOption]);
+  }, [selectedOption, isLoading]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -131,7 +131,7 @@ export default function Home() {
   );
 
   const handleUploadConfig = () => {
-    console.log("Config upload clicked");
+    router.push('/upload-config');
   };
 
   if (isLoading) {
