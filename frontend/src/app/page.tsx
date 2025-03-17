@@ -25,11 +25,13 @@ export default function Home() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Scripts");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Still used for data fetching
+  const [showIntroAnimation, setShowIntroAnimation] = useState(true); // New state for animation
   const searchRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
+  // Fetch initial data
   useEffect(() => {
     async function fetchInitialData() {
       try {
@@ -46,6 +48,7 @@ export default function Home() {
     fetchInitialData();
   }, []);
 
+  // Fetch data when selectedOption changes
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -66,8 +69,9 @@ export default function Home() {
     if (!isLoading) {
       fetchData();
     }
-  }, [selectedOption, isLoading]); // Added isLoading to dependency array
+  }, [selectedOption, isLoading]);
 
+  // Handle click outside for search and dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
@@ -83,6 +87,14 @@ export default function Home() {
     };
   }, []);
 
+  // Control the intro animation (runs for 3 seconds on mount)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowIntroAnimation(false);
+    }, 3000); // Animation lasts 3 seconds
+    return () => clearTimeout(timer); // Cleanup timer on unmount
+  }, []);
+
   const filteredScripts = scripts.filter(script => 
     script.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -92,37 +104,38 @@ export default function Home() {
   );
 
   const handleUploadConfig = () => {
-    router.push('/upload-config'); // Use router to redirect
+    router.push('/upload-config');
   };
-
-  if (isLoading) {
-    return (
-      <div 
-        className={`min-h-screen relative flex items-center justify-center ${spaceGrotesk.className}`}
-        style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        >
-          <Image 
-            src="/images/flarial-logo.png" 
-            alt="Loading" 
-            width={50} 
-            height={50} 
-            className="rounded relative z-10"
-          />
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div 
       className={`min-h-screen relative overflow-hidden ${spaceGrotesk.className}`}
       style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
+      {/* Intro Animation Overlay */}
+      {showIntroAnimation && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1, delay: 2 }} // Fade out after 2s, over 1s
+          className="absolute inset-0 flex items-center justify-center z-50"
+        >
+          <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Image 
+              src="/images/flarial-logo.png" 
+              alt="Intro Animation" 
+              width={50} 
+              height={50} 
+              className="rounded relative z-10"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+
       <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
       <main className="relative max-w-7xl mx-auto p-6 md:p-12">
         <div className="flex flex-col items-start mb-6">
@@ -134,9 +147,7 @@ export default function Home() {
             Browse and download community-created {selectedOption.toLowerCase()} for Flarial
           </p>
 
-          {/* Dropdown and Upload Button */}
           <div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
-            {/* Dropdown Menu */}
             <div className="relative">
               <button
                 className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
@@ -164,7 +175,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* Config Upload Button - Only shows when Configs is selected */}
             {selectedOption === "Configs" && (
               <button
                 className="px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
