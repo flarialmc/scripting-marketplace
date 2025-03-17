@@ -61,16 +61,16 @@ export default function Home() {
     };
   }, []);
 
-  const filteredScripts = scripts.filter(script => 
+  const filteredScripts = scripts.filter(script =>
     script.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredConfigs = configs.filter(config => 
+  const filteredConfigs = configs.filter(config =>
     config.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div 
+    <div
       className={`min-h-screen relative overflow-hidden ${spaceGrotesk.className}`}
       style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
@@ -85,7 +85,7 @@ export default function Home() {
             Browse and download community-created {selectedOption.toLowerCase()} for Flarial
           </p>
 
-          {/* Dropdown & Upload Configs */}
+          {/* Dropdown & Search */}
           <div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
             {/* Dropdown Menu */}
             <div className="relative">
@@ -115,29 +115,30 @@ export default function Home() {
               )}
             </div>
 
-          <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
-            <motion.div
-              initial={{ width: 40, height: 40 }}
-              animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2"
-            >
-              <motion.input
-                type="text"
-                placeholder={`Search for ${selectedOption.toLowerCase()}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`bg-transparent text-white focus:outline-none transition-all ${
-                  isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
-                }`}
-              />
-              <button
-                onClick={() => setIsSearchOpen((prev) => !prev)}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+            <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+              <motion.div
+                initial={{ width: 40, height: 40 }}
+                animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2"
               >
-                <FaSearch size={18} className="text-white" />
-              </button>
-            </motion.div>
+                <motion.input
+                  type="text"
+                  placeholder={`Search for ${selectedOption.toLowerCase()}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`bg-transparent text-white focus:outline-none transition-all ${
+                    isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
+                  }`}
+                />
+                <button
+                  onClick={() => setIsSearchOpen((prev) => !prev)}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+                >
+                  <FaSearch size={18} className="text-white" />
+                </button>
+              </motion.div>
+            </div>
           </div>
         </div>
 
