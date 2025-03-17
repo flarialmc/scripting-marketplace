@@ -1,12 +1,13 @@
 package scripts
 
 import (
+	"bufio"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"bufio"
+	"fmt"
 )
 
 type ScriptHandler struct {
@@ -37,7 +38,6 @@ func (h *ScriptHandler) HandleCORS(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ScriptMetadata represents the metadata structure
 type ScriptMetadata struct {
 	Name        string
 	Description string
@@ -66,7 +66,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 		scriptPath := filepath.Join(h.baseDir, entry.Name())
 		scriptName := strings.TrimSuffix(entry.Name(), ".lua")
 
-		// Parse metadata from Lua file
 		file, err := os.Open(scriptPath)
 		if err != nil {
 			log.Printf("Error opening script file %s: %v", scriptPath, err)
@@ -78,13 +77,10 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
-			
-			// Skip empty lines and comments
 			if line == "" || strings.HasPrefix(line, "--") {
 				continue
 			}
 
-			// Parse name
 			if strings.HasPrefix(line, "name = ") {
 				parts := strings.SplitN(line, "=", 2)
 				if len(parts) == 2 {
@@ -93,7 +89,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 				}
 			}
 
-			// Parse description
 			if strings.HasPrefix(line, "description = ") {
 				parts := strings.SplitN(line, "=", 2)
 				if len(parts) == 2 {
@@ -102,7 +97,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 				}
 			}
 
-			// Parse author (optional, since not in your example)
 			if strings.HasPrefix(line, "author = ") {
 				parts := strings.SplitN(line, "=", 2)
 				if len(parts) == 2 {
@@ -111,7 +105,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 				}
 			}
 
-			// Stop after we've found all metadata we care about
 			if metadata.Name != "" && metadata.Description != "" {
 				break
 			}
@@ -148,7 +141,6 @@ func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Extract script name from path
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/scripts/"), "/")
 	if len(parts) < 1 {
 		http.Error(w, "Invalid request path", http.StatusBadRequest)
@@ -158,17 +150,14 @@ func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) 
 	scriptName := parts[0]
 	log.Printf("Requested script: %s", scriptName)
 
-	// Validate script name
 	if strings.Contains(scriptName, "..") {
 		http.Error(w, "Invalid script name", http.StatusBadRequest)
 		return
 	}
 
-	// Construct file path with .lua extension
 	filePath := filepath.Join(h.baseDir, scriptName+".lua")
 	log.Printf("Attempting to serve file: %s", filePath)
 
-	// Verify file exists within base directory
 	absPath, err := filepath.Abs(filePath)
 	if err != nil || !strings.HasPrefix(absPath, h.baseDir) {
 		log.Printf("Invalid file path: %s", filePath)
@@ -176,7 +165,6 @@ func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Check if file exists
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -195,5 +183,53 @@ func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
+	http.ServeFile(w, r, filePath)
+}
+
+func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract script name from path (removing "/download" suffix)
+	scriptName := strings.TrimPrefix(r.URL.Path, "/api/scripts/")
+	scriptName = strings.TrimSuffix(scriptName, "/download")
+
+	if strings.Contains(scriptName, "..") {
+		http.Error(w, "Invalid script name", http.StatusBadRequest)
+		return
+	}
+
+	filePath := filepath.Join(h.baseDir, scriptName+".lua")
+	log.Printf("Attempting to serve download: %s", filePath)
+
+	absPath, err := filepath.Abs(filePath)
+	if err != nil || !strings.HasPrefix(absPath, h.baseDir) {
+		log.Printf("Invalid file path: %s", filePath)
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Printf("File not found: %s", filePath)
+			http.Error(w, "File not found", http.StatusNotFound)
+		} else {
+			log.Printf("Error accessing file: %v", err)
+			http.Error(w, "Error accessing file", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if fileInfo.IsDir() {
+		http.Error(w, "Cannot serve directory", http.StatusBadRequest)
+		return
+	}
+
+	// Set headers for file download
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.lua\"", scriptName))
 	http.ServeFile(w, r, filePath)
 }
