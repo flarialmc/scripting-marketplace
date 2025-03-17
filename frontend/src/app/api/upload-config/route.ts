@@ -15,6 +15,11 @@ function getUserIdentifier(request: NextRequest): string {
   return `${ip}-${cookieId}`;
 }
 
+// Helper to generate ID from name
+function generateIdFromName(name: string): string {
+  return name.replace(/\s+/g, '').toLowerCase(); // Remove all spaces and convert to lowercase
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Step 1: Identify the user and check cooldown
@@ -47,19 +52,23 @@ export async function POST(request: NextRequest) {
     const files = formData.getAll('files') as File[];
     const configData = JSON.parse(formData.get('configData') as string);
 
-    // Step 3: Determine folder name (used as the config folder)
+    // Step 3: Determine folder name and ID
     let folderName = '';
+    let generatedId = '';
     const mainJsonFile = files.find(f => f.name === 'main.json');
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
-      // Use configData.id or configData.name as the folder name, falling back to timestamp
-      folderName = configData.id?.trim() || configData.name?.trim() || mainJson.name?.trim() || `config-${Date.now()}`;
+      const name = configData.name?.trim() || mainJson.name?.trim() || `config-${Date.now()}`;
+      generatedId = generateIdFromName(name); // Generate ID from name
+      folderName = generatedId; // Use generated ID as folder name
     } else {
-      folderName = configData.id?.trim() || configData.name?.trim() || `config-${Date.now()}`;
+      const name = configData.name?.trim() || `config-${Date.now()}`;
+      generatedId = generateIdFromName(name); // Generate ID from name
+      folderName = generatedId; // Use generated ID as folder name
     }
     if (!folderName) throw new Error('Invalid folder name');
-    console.log(`Folder name: ${folderName}`);
+    console.log(`Folder name: ${folderName}, Generated ID: ${generatedId}`);
 
     // Step 4: Check for duplicate processing
     if (processingRequests.has(folderName)) {
@@ -99,11 +108,11 @@ export async function POST(request: NextRequest) {
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
     console.log(`Branch created: ${newBranch}`);
 
-    // Step 8: Prepare files for commit (including auto-generated manifest if needed)
+    // Step 8: Prepare files for commit (including auto-generated main.json if needed)
     const updatedFiles = mainJsonFile ? files : [
       ...files,
       new File([JSON.stringify({
-        id: configData.id,
+        id: generatedId, // Use generated ID
         name: configData.name,
         version: configData.version,
         author: configData.author,
@@ -114,7 +123,6 @@ export async function POST(request: NextRequest) {
     const treeItems = [];
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
-      // Extract just the base filename, removing any folder structure (e.g., "MBG_TEST/file.txt" -> "file.txt")
       const baseFileName = file.name.split('/').pop() || file.name;
       const filePath = `backend/configs/${folderName}/${baseFileName}`;
       console.log(`Staging file: ${filePath}`);

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { signIn, signOut, useSession, SessionProvider } from 'next-auth/react';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
+import { useRouter } from 'next/navigation'; // Import useRouter for redirect
 
 // Extend HTMLInputElement to include webkitdirectory
 declare module 'react' {
@@ -20,7 +21,6 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 interface ConfigFormData {
-  id: string;
   name: string;
   version: string;
   author: string;
@@ -31,15 +31,17 @@ function ConfigUploadInner() {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ConfigFormData>({
-    id: '',
     name: '',
     version: '',
     author: '',
   });
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState<boolean>(false); // New state for success popup
+  const [successMessage, setSuccessMessage] = useState<string>(''); // Store success message
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const router = useRouter(); // Router for navigation
 
   useEffect(() => {
     if (session?.user?.name) {
@@ -130,7 +132,9 @@ function ConfigUploadInner() {
         throw new Error(`API request failed: ${await response.text()}`);
       }
 
-      setError(`Pull request created successfully for ${formData.name || 'Unnamed Config'}!`);
+      const successMsg = `Pull request created successfully for ${formData.name || 'Unnamed Config'}!`;
+      setSuccessMessage(successMsg); // Set success message
+      setShowSuccessPopup(true); // Show popup
       resetForm();
     } catch (err) {
       console.error('Submit error:', err);
@@ -142,10 +146,15 @@ function ConfigUploadInner() {
 
   const resetForm = () => {
     setFiles([]);
-    setFormData({ id: '', name: '', version: '', author: session?.user?.name || '' });
+    setFormData({ name: '', version: '', author: session?.user?.name || '' });
     setShowForm(false);
     setIconPreview(null);
     setError(null);
+  };
+
+  const closeSuccessPopup = () => {
+    setShowSuccessPopup(false);
+    router.push('/'); // Redirect to homepage after closing
   };
 
   if (status === 'loading') {
@@ -224,7 +233,7 @@ function ConfigUploadInner() {
                 Choose Files
                 <input
                   type="file"
-                  webkitdirectory="true" // Now recognized by TypeScript
+                  webkitdirectory="true"
                   multiple
                   onChange={handleFolderUpload}
                   className="hidden"
@@ -238,14 +247,6 @@ function ConfigUploadInner() {
           {showForm && (
             <div className="mb-4 p-4 bg-black/20 rounded-md w-full">
               <h2 className="text-white mb-2">Create main.json</h2>
-              <input
-                type="text"
-                name="id"
-                value={formData.id}
-                onChange={handleInputChange}
-                placeholder="Config ID"
-                className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-              />
               <input
                 type="text"
                 name="name"
@@ -277,7 +278,7 @@ function ConfigUploadInner() {
           {session && (
             <button
               onClick={handleSubmit}
-              disabled={isUploading || files.length === 0 || (showForm && !formData.id)}
+              disabled={isUploading || files.length === 0 || (showForm && !formData.name)}
               className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all mb-6 w-full max-w-xs mx-auto"
             >
               {isUploading ? 'Uploading...' : 'Submit Config'}
@@ -292,6 +293,22 @@ function ConfigUploadInner() {
                 Back
               </button>
             </Link>
+          </div>
+        )}
+
+        {/* Success Popup */}
+        {showSuccessPopup && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+            <div className="bg-[#201a1b] p-6 rounded-lg shadow-lg text-center max-w-md w-full">
+              <h3 className="text-2xl font-bold text-white mb-4">Success!</h3>
+              <p className="text-green-400 mb-6">{successMessage}</p>
+              <button
+                onClick={closeSuccessPopup}
+                className="bg-[#d32f2f] text-white px-4 py-2 rounded-md hover:bg-[#b71c1c] transition-colors"
+              >
+                OK
+              </button>
+            </div>
           </div>
         )}
       </div>
