@@ -1,265 +1,243 @@
 'use client';
-
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
+import { ConfigGrid } from '@/components/ConfigGrid/ConfigGrid';
+import { listScripts } from '@/services/scripts';
+import { listConfigs } from '@/services/configs';
+import { Script } from '@/types/script';
+import { Config } from '@/types/config';
 import Image from 'next/image';
+import { Space_Grotesk } from 'next/font/google';
+import { FaSearch, FaChevronDown } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
-interface ConfigFormData {
-  id: string;
-  name: string;
-  version: string;
-  author: string;
-}
+export const dynamic = 'force-dynamic';
 
-interface ConfigCardProps {
-  config: {
-    id: string;
-    name: string;
-    author: string;
-    createdAt: string;
-  };
-  iconPreview: string | null;
-}
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
+const flarialLogo = "/images/flarial-logo.png";
+const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your Flarial Discord server ID
 
-const ConfigCard = ({ config, iconPreview }: ConfigCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 transition-all hover:scale-[1.05] hover:z-10 shadow-md">
-      {/* Config Image with Hover Preview */}
-      <div 
-        className="relative w-full h-40 bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {iconPreview ? (
-          <Image
-            src={iconPreview}
-            alt="Config Image Preview"
-            unoptimized={true}
-            className="w-full h-full object-cover"
-            width={160}
-            height={160}
-          />
-        ) : (
-          <div className="text-gray-500">No Icon in Folder</div>
-        )}
-
-        {/* Hover Full Image Preview */}
-        {isHovered && iconPreview && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-              <div className="relative bg-[#201a1b] p-4 rounded-xl shadow-lg">
-                <Image
-                  src={iconPreview}
-                  alt="Full Config Image Preview"
-                  width={600}
-                  height={337}
-                  unoptimized={true}
-                  className="w-[600px] h-auto rounded-lg"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Config Info */}
-      <div className="flex justify-between mt-3">
-        <div className="p-2 bg-black/20 rounded-md text-gray-300 text-sm">
-          <p>Author: {config.author || 'Unknown'}</p>
-          <p>Name: {config.name || 'Unnamed Config'}</p>
-          <p>Uploaded: {config.createdAt}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function ConfigUploadPage() {
-  const [files, setFiles] = useState<File[]>([]);
+export default function Home() {
+  const [scripts, setScripts] = useState<Script[]>([]);
+  const [configs, setConfigs] = useState<Config[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ConfigFormData>({
-    id: '',
-    name: '',
-    version: '',
-    author: '',
-  });
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [iconPreview, setIconPreview] = useState<string | null>(null);
-
-  const handleFolderUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const uploadedFiles = Array.from(e.target.files || []);
-    setFiles(uploadedFiles);
-    validateFolder(uploadedFiles);
-  };
-
-  const validateFolder = (uploadedFiles: File[]) => {
-    const allowedExtensions = ['.json', '.png', '.flarial'];
-    const fileNames = uploadedFiles.map(file => file.webkitRelativePath.split('/').pop() || '');
-
-    const hasDisallowedFiles = uploadedFiles.some(file => {
-      const extension = file.name.slice(file.name.lastIndexOf('.'));
-      return !allowedExtensions.includes(extension) || 
-             (extension === '.json' && file.name !== 'main.json') ||
-             (extension === '.png' && file.name !== 'icon.png');
-    });
-
-    if (hasDisallowedFiles) {
-      setError('Folder can only contain main.json, icon.png, and .flarial files.');
-      setFiles([]);
-      setIconPreview(null);
-      setShowForm(false);
-      return;
-    }
-
-    const hasMainJson = fileNames.includes('main.json');
-    const hasIcon = fileNames.includes('icon.png');
-    
-    if (!hasIcon) {
-      const defaultIcon = new File([], 'icon.png', { type: 'image/png' });
-      setFiles(prevFiles => [...prevFiles, defaultIcon]);
-    }
-
-    if (!hasMainJson) {
-      setShowForm(true);
-    } else {
-      setShowForm(false);
-    }
-    setError(null);
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("Scripts");
+  const [canUpload, setCanUpload] = useState(false);
+  const searchRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const iconFile = files.find(file => file.name === 'icon.png');
-    if (iconFile && iconFile.size > 0) { // Ensure it's not the default empty file
-      const reader = new FileReader();
-      reader.onload = (e) => setIconPreview(e.target?.result as string);
-      reader.readAsDataURL(iconFile);
-    } else {
-      setIconPreview(null);
-    }
-  }, [files]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async () => {
-    setIsUploading(true);
-    const formDataToSend = new FormData();
-    files.forEach(file => formDataToSend.append('files', file));
-    formDataToSend.append('configData', JSON.stringify(formData));
-
-    try {
-      const response = await fetch('/api/upload-config', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${await response.text()}`);
+    async function fetchData() {
+      try {
+        if (selectedOption === "Scripts") {
+          const data = await listScripts();
+          setScripts(data);
+        } else {
+          const data = await listConfigs();
+          setConfigs(data);
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load data');
       }
-
-      setError(`Pull request created successfully for ${formData.name || 'Unnamed Config'}!`);
-      resetForm();
-    } catch (err) {
-      console.error('Submit error:', err);
-      setError(`Error creating pull request: ${err instanceof Error ? err.message : String(err)}`);
-    } finally {
-      setIsUploading(false);
     }
-  };
+    fetchData();
+  }, [selectedOption]);
 
-  const resetForm = () => {
-    setFiles([]);
-    setFormData({ id: '', name: '', version: '', author: '' });
-    setShowForm(false);
-    setIconPreview(null);
-    setError(null);
-  };
+  useEffect(() => {
+    async function checkDiscordMembership() {
+      if (status === "authenticated" && session?.accessToken) {
+        try {
+          const response = await fetch('https://discord.com/api/users/@me/guilds', {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          });
+          const guilds = await response.json();
+          const isMember = guilds.some((guild: any) => guild.id === FLARIAL_DISCORD_ID);
+          setCanUpload(isMember);
+          
+          // Store membership status in localStorage for persistence
+          localStorage.setItem(`discord_member_${session.user?.id}`, JSON.stringify(isMember));
+        } catch (err) {
+          setCanUpload(false);
+          console.error('Error checking Discord membership:', err);
+        }
+      } else {
+        setCanUpload(false);
+      }
+    }
+    checkDiscordMembership();
+  }, [session, status]);
 
-  // Config object for preview, updating in real-time
-  const previewConfig = {
-    id: formData.id,
-    name: formData.name,
-    author: formData.author,
-    createdAt: new Date().toLocaleDateString(), // Use current date for preview
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
+      if (dropdownRef.current && event.target instanceof Node && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const filteredScripts = scripts.filter(script =>
+    script.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredConfigs = configs.filter(config =>
+    config.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleUploadClick = () => {
+    if (status === "unauthenticated") {
+      signIn("discord");
+    } else if (!canUpload) {
+      setError("You must be a member of the Flarial Discord server to upload.");
+    } else {
+      // Add your upload logic here
+      router.push('/upload'); // Example route
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#121212]">
-      <div className="max-w-4xl w-full p-6 bg-[#201a1b] rounded-lg shadow-md text-center">
-        <h1 className="text-3xl font-semibold text-white mb-4">Upload Config Folder</h1>
-        
-        <input
-          type="file"
-          // @ts-expect-error webkitdirectory is not in standard TS types
-          webkitdirectory="true"
-          directory=""
-          multiple
-          onChange={handleFolderUpload}
-          className="mb-4 w-full text-white bg-[#3a2f30] p-2 rounded-md cursor-pointer hover:bg-[#4C3F40]"
-        />
-
-        {error && <p className="text-red-400 mb-4">{error}</p>}
-
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Form Section */}
-          <div className="flex-1">
-            {showForm && (
-              <div className="mb-4 p-4 bg-black/20 rounded-md">
-                <h2 className="text-white mb-2">Create main.json</h2>
-                <input
-                  type="text"
-                  name="id"
-                  value={formData.id}
-                  onChange={handleInputChange}
-                  placeholder="Config ID"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Config Name"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="version"
-                  value={formData.version}
-                  onChange={handleInputChange}
-                  placeholder="Version"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleInputChange}
-                  placeholder="Author"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-              </div>
-            )}
-
-            <button
-              onClick={handleSubmit}
-              disabled={isUploading || files.length === 0 || (showForm && !formData.id)}
-              className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all"
-            >
-              {isUploading ? 'Uploading...' : 'Submit Config'}
-            </button>
+    <div
+      className={`min-h-screen relative overflow-hidden ${spaceGrotesk.className}`}
+      style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
+      <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
+      <main className="relative max-w-7xl mx-auto p-6 md:p-12">
+        <div className="flex flex-col items-start mb-6">
+          <div className="flex items-center space-x-3">
+            <Image src={flarialLogo} alt="Flarial Logo" width={47} height={52} className="rounded" />
+            <h1 className="text-5xl font-extrabold tracking-tight text-white leading-none">Flarial {selectedOption}</h1>
           </div>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">
+            Browse and download community-created {selectedOption.toLowerCase()} for Flarial
+          </p>
 
-          {/* Preview Section */}
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold text-white mb-2">Preview</h2>
-            <ConfigCard config={previewConfig} iconPreview={iconPreview} />
+          {/* Dropdown & Upload Controls */}
+          <div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
+            {/* Dropdown Menu */}
+            <div className="relative">
+              <button
+                className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
+                onClick={() => setIsDropdownOpen(prev => !prev)}
+              >
+                {selectedOption} <FaChevronDown className="ml-2" />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-48 bg-[#201a1b] rounded-md shadow-lg z-10">
+                  <ul>
+                    <li
+                      className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+                      onClick={() => { setSelectedOption("Scripts"); setIsDropdownOpen(false); }}
+                    >
+                      Scripts
+                    </li>
+                    <li
+                      className="px-4 py-2 hover:bg-[#2a2223] text-white cursor-pointer"
+                      onClick={() => { setSelectedOption("Configs"); setIsDropdownOpen(false); }}
+                    >
+                      Configs
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Auth and Upload Button */}
+            <div className="flex items-center space-x-4">
+              {status === "authenticated" ? (
+                <>
+                  <span className="text-white">Welcome, {session.user?.name}</span>
+                  <button
+                    onClick={handleUploadClick}
+                    className={`px-4 py-2 rounded-md text-white ${
+                      canUpload ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 cursor-not-allowed'
+                    }`}
+                    disabled={!canUpload}
+                  >
+                    Upload {selectedOption}
+                  </button>
+                  <button
+                    onClick={() => signOut()}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => signIn("discord")}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Sign in with Discord
+                </button>
+              )}
+            </div>
+
+            <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+              <motion.div
+                initial={{ width: 40, height: 40 }}
+                animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2"
+              >
+                <motion.input
+                  type="text"
+                  placeholder={`Search for ${selectedOption.toLowerCase()}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`bg-transparent text-white focus:outline-none transition-all ${
+                    isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
+                  }`}
+                />
+                <button
+                  onClick={() => setIsSearchOpen((prev) => !prev)}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+                >
+                  <FaSearch size={18} className="text-white" />
+                </button>
+              </motion.div>
+            </div>
           </div>
         </div>
-      </div>
+
+        {error && (
+          <div className="p-4 rounded-lg bg-red-200 dark:bg-red-900 border border-red-400 dark:border-red-700 mb-6">
+            <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
+          </div>
+        )}
+
+        {selectedOption === "Scripts" ? (
+          filteredScripts.length > 0 ? (
+            <ScriptGrid scripts={filteredScripts} />
+          ) : (
+            <div className="text-center py-12 mt-12">
+              <p className="text-gray-600 dark:text-gray-400">No matching scripts found.</p>
+            </div>
+          )
+        ) : (
+          filteredConfigs.length > 0 ? (
+            <ConfigGrid configs={filteredConfigs} />
+          ) : (
+            <div className="text-center py-12 mt-12">
+              <p className="text-gray-600 dark:text-gray-400">No matching configs found.</p>
+            </div>
+          )
+        )}
+      </main>
     </div>
   );
 }
