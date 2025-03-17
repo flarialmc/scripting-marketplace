@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"fmt"
+        "encoding/json"
 )
 
 type ScriptHandler struct {
