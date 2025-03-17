@@ -26,6 +26,11 @@ interface ConfigFormData {
   author: string;
 }
 
+interface Guild {
+  id: string;
+  name: string;
+}
+
 export default function Home() {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [configs, setConfigs] = useState<Config[]>([]);
@@ -77,8 +82,8 @@ export default function Home() {
             },
           });
           if (!response.ok) throw new Error('Failed to fetch guilds');
-          const guilds = await response.json();
-          const isMember = guilds.some((guild: any) => guild.id === FLARIAL_DISCORD_ID);
+          const guilds: Guild[] = await response.json();
+          const isMember = guilds.some(guild => guild.id === FLARIAL_DISCORD_ID);
           setCanUpload(isMember);
           localStorage.setItem(`discord_member_${session.user?.id}`, JSON.stringify(isMember));
         } catch (err) {
@@ -221,7 +226,7 @@ export default function Home() {
       setShowForm(false);
       setFormData({ id: '', name: '', version: '', author: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
-      router.refresh();
+      router.refresh(); // This uses router, fixing the unused variable error
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
