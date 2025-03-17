@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         version: configData.version,
         author: configData.author,
         createdAt: new Date().toISOString(),
-      }, null, 2)], 'manifest.json', { type: 'application/json' }),
+      }, null, 2)], 'main.json', { type: 'application/json' }),
     ];
 
     const treeItems = [];
