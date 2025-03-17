@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"fmt"
-        "encoding/json"
+	"encoding/json"
 )
 
 type ScriptHandler struct {
@@ -104,10 +104,6 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
 					value := strings.TrimSpace(parts[1])
 					metadata.Author = strings.Trim(value, `"`)
 				}
-			}
-
-			if metadata.Name != "" && metadata.Description != "" {
-				break
 			}
 		}
 
