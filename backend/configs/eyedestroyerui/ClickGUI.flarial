@@ -1,0 +1,346 @@
+[
+    {
+        "name": "colors_primary3",
+        "value": "ffffff"
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "colors_text_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary7_rgb",
+        "value": false
+    },
+    {
+        "name": "editmenubind",
+        "value": "L"
+    },
+    {
+        "name": "o_colors_enabled",
+        "value": 1.0
+    },
+    {
+        "name": "colors_text",
+        "value": "ffffff"
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "o_colors_secondary5",
+        "value": 1.0
+    },
+    {
+        "name": "colors_enabled_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_text",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary5",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_enabled",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_secondary5_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_disabled",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_primary4",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_secondary8",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_disabled",
+        "value": 1.0
+    },
+    {
+        "name": "colors_disabled_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_primary1",
+        "value": "ffffff"
+    },
+    {
+        "name": "percentageX",
+        "value": 0.0
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "o_colors_primary1",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary1_rgb",
+        "value": false
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "colors_primary2",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_mod4_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_primary2",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary2_rgb",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "colors_secondary6",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_primary3",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary3_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_primary4",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_primary4_rgb",
+        "value": false
+    },
+    {
+        "name": "textscale",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary1",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_secondary1",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod1",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_secondary1_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary2",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_secondary6_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_secondary2",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary4_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod2",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_secondary2_rgb",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "colors_secondary3",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_secondary3",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod3",
+        "value": "ffffff"
+    },
+    {
+        "name": "colors_secondary3_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary4",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_secondary4",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod4",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_secondary6",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary7",
+        "value": "ffffff"
+    },
+    {
+        "name": "o_colors_secondary7",
+        "value": 1.0
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_mod4",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary8",
+        "value": "302728"
+    },
+    {
+        "name": "percentageY",
+        "value": 0.0
+    },
+    {
+        "name": "colors_secondary8_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_mod1",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod3_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod1_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_mod2",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod2_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_mod3",
+        "value": 1.0
+    },
+    {
+        "name": "keybind",
+        "value": "K"
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6499999761581421
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    }
+]
