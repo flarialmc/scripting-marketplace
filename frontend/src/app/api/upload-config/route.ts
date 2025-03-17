@@ -3,13 +3,12 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 
 // Store to track user uploads with timestamps
-const userUploadTracker = new Map<string, number>(); // Key: userId, Value: timestamp (ms)
+const userUploadTracker = new Map<string, number>(); 
 const processingRequests = new Set<string>();
 
 // Time limit: 24 hours in milliseconds
 const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
-const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your server ID
-
+const FLARIAL_DISCORD_ID = "1049946152092586054"; 
 async function checkDiscordMembership(accessToken: string): Promise<boolean> {
   const response = await fetch('https://discord.com/api/users/@me/guilds', {
     headers: { Authorization: `Bearer ${accessToken}` },
