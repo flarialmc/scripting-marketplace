@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
-      // Use configData.id as the folder name, falling back to name or timestamp
-      folderName = configData.id?.trim() || mainJson.name?.trim() || configData.name?.trim() || `config-${Date.now()}`;
+      // Use configData.id or configData.name as the folder name, falling back to timestamp
+      folderName = configData.id?.trim() || configData.name?.trim() || mainJson.name?.trim() || `config-${Date.now()}`;
     } else {
       folderName = configData.id?.trim() || configData.name?.trim() || `config-${Date.now()}`;
     }
@@ -114,12 +114,9 @@ export async function POST(request: NextRequest) {
     const treeItems = [];
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
-const filePaths = uploadedFiles.map(file => {
-  const parts = file.webkitRelativePath.split('/');
-  parts.splice(1, 1); // Remove the second element (top-level folder)
-  return parts.join('/');
-});
-
+      // Extract just the base filename, removing any folder structure (e.g., "MBG_TEST/file.txt" -> "file.txt")
+      const baseFileName = file.name.split('/').pop() || file.name;
+      const filePath = `backend/configs/${folderName}/${baseFileName}`;
       console.log(`Staging file: ${filePath}`);
       
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
