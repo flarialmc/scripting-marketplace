@@ -6,6 +6,13 @@ import { signIn, signOut, useSession, SessionProvider } from 'next-auth/react';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 
+// Extend HTMLInputElement to include webkitdirectory
+declare module 'react' {
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    webkitdirectory?: string | boolean;
+  }
+}
+
 const spaceGrotesk = Space_Grotesk({
   weight: ['400', '700'],
   subsets: ['latin'],
@@ -33,9 +40,13 @@ function ConfigUploadInner() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [iconPreview, setIconPreview] = useState<string | null>(null);
+
   useEffect(() => {
     if (session?.user?.name) {
-      setFormData(prev => ({ ...prev, author: session.user.name }));
+      setFormData(prev => ({
+        ...prev,
+        author: session.user.name ?? '',
+      }));
     }
   }, [session]);
 
@@ -51,9 +62,11 @@ function ConfigUploadInner() {
 
     const hasDisallowedFiles = uploadedFiles.some(file => {
       const extension = file.name.slice(file.name.lastIndexOf('.'));
-      return !allowedExtensions.includes(extension) || 
-             (extension === '.json' && file.name !== 'main.json') ||
-             (extension === '.png' && file.name !== 'icon.png');
+      return (
+        !allowedExtensions.includes(extension) ||
+        (extension === '.json' && file.name !== 'main.json') ||
+        (extension === '.png' && file.name !== 'icon.png')
+      );
     });
 
     if (hasDisallowedFiles) {
@@ -66,7 +79,7 @@ function ConfigUploadInner() {
 
     const hasMainJson = fileNames.includes('main.json');
     const hasIcon = fileNames.includes('icon.png');
-    
+
     if (!hasIcon) {
       const defaultIcon = new File([], 'icon.png', { type: 'image/png' });
       setFiles(prevFiles => [...prevFiles, defaultIcon]);
@@ -211,8 +224,7 @@ function ConfigUploadInner() {
                 Choose Files
                 <input
                   type="file"
-                  webkitdirectory="true"
-                  directory=""
+                  webkitdirectory="true" // Now recognized by TypeScript
                   multiple
                   onChange={handleFolderUpload}
                   className="hidden"

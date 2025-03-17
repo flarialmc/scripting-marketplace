@@ -14,25 +14,22 @@ declare module "next-auth" {
   }
 }
 
-// NextAuth configuration options
-export const authOptions: NextAuthOptions = {
+// Define authOptions without exporting it
+const authOptions: NextAuthOptions = {
   providers: [
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-      // Optional: Specify the scope if you need additional permissions
-      authorization: { params: { scope: "identify" } }, // 'identify' is enough for username and ID
+      authorization: { params: { scope: "identify" } },
     }),
   ],
   callbacks: {
-    // Add Discord ID to the session
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub; // Discord ID
       }
       return session;
     },
-    // Optional: Customize the JWT token if needed
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -40,16 +37,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  // Optional: Customize the pages if you want custom sign-in/sign-out pages
   pages: {
-    signIn: undefined, // Use default NextAuth sign-in page
-    signOut: undefined, // Use default NextAuth sign-out page
+    signIn: undefined,
+    signOut: undefined,
   },
-  secret: process.env.NEXTAUTH_SECRET, // Required for security
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
-// Create the NextAuth handler
-const handler = NextAuth(authOptions);
-
-// Export the handler for both GET and POST requests
-export { handler as GET, handler as POST };
+// Export only the HTTP handlers
+export const GET = NextAuth(authOptions);
+export const POST = NextAuth(authOptions);
