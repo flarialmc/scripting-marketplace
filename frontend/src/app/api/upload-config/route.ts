@@ -1,14 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import NextAuth from "next-auth";
+import DiscordProvider from "next-auth/providers/discord";
+import { getToken } from "next-auth/jwt";
 
 // Store to track user uploads with timestamps
-const userUploadTracker = new Map<string, number>(); 
+const userUploadTracker = new Map<string, number>(); // Key: userId, Value: timestamp (ms)
 const processingRequests = new Set<string>();
 
 // Time limit: 24 hours in milliseconds
 const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
-const FLARIAL_DISCORD_ID = "1049946152092586054"; 
+const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your server ID
+
+// NextAuth configuration
+const authOptions = {
+  providers: [
+    DiscordProvider({
+      clientId: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      authorization: { params: { scope: "identify guilds" } },
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, account }: any) {
+      if (account) {
+        token.accessToken = account.access_token;
+        token.id = account.providerAccountId;
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
+      session.accessToken = token.accessToken;
+      session.user.id = token.id;
+      return session;
+    },
+  },
+};
+
+// Initialize NextAuth handler (not exported, used internally)
+const authHandler = NextAuth(authOptions);
+
 async function checkDiscordMembership(accessToken: string): Promise<boolean> {
   const response = await fetch('https://discord.com/api/users/@me/guilds', {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -19,14 +50,16 @@ async function checkDiscordMembership(accessToken: string): Promise<boolean> {
 }
 
 export async function POST(request: NextRequest) {
+  // Get session token manually
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+
   // Step 1: Check authentication
-  const session = await getServerSession(authOptions);
-  if (!session || !session.accessToken || !session.user.id) {
+  if (!token || !token.accessToken || !token.id) {
     return NextResponse.json({ error: "Unauthorized. Please sign in with Discord." }, { status: 401 });
   }
 
   // Step 2: Check Discord membership
-  const isMember = await checkDiscordMembership(session.accessToken);
+  const isMember = await checkDiscordMembership(token.accessToken as string);
   if (!isMember) {
     return NextResponse.json(
       { error: "You must be a member of the Flarial Discord server to upload." },
@@ -34,8 +67,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Step 3: Use user ID from session instead of IP/cookie
-  const userId = session.user.id;
+  // Step 3: Use user ID from token
+  const userId = token.id as string;
   
   // Step 4: Check cooldown
   const lastUploadTime = userUploadTracker.get(userId);
@@ -60,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Step 6: Determine folder name
     let folderName = '';
-    const mainJsonFile = files.find(f => f.name === 'main.json');
+    const mainJsonFile = files.find(f => f.name.toLowerCase() === 'main.json');
     if (mainJsonFile) {
       const mainJsonText = await mainJsonFile.text();
       const mainJson = JSON.parse(mainJsonText) as { name?: string };
@@ -112,7 +145,7 @@ export async function POST(request: NextRequest) {
         id: configData.id,
         name: configData.name,
         version: configData.version,
-        author: session.user.name || "Unknown", // Use Discord username
+        author: token.name || "Unknown", // Use Discord username from token
         createdAt: new Date().toISOString(),
       }, null, 2)], 'manifest.json', { type: 'application/json' }),
     ];
@@ -145,7 +178,7 @@ export async function POST(request: NextRequest) {
     const commitResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/commits`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ message: `Add ${folderName} configuration by ${session.user.name}`, tree: treeData.sha, parents: [baseSha] }),
+      body: JSON.stringify({ message: `Add ${folderName} configuration by ${token.name}`, tree: treeData.sha, parents: [baseSha] }),
     });
     if (!commitResponse.ok) throw new Error(`Failed to create commit: ${await commitResponse.text()}`);
     const commitData = await commitResponse.json();
@@ -163,10 +196,10 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        title: `Add config: ${folderName} by ${session.user.name}`,
+        title: `Add config: ${folderName} by ${token.name}`,
         head: newBranch,
         base: baseBranch,
-        body: `This PR adds the ${folderName} configuration to backend/configs/. Submitted by ${session.user.name}.`,
+        body: `This PR adds the ${folderName} configuration to backend/configs/. Submitted by ${token.name}.`,
       }),
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
@@ -185,3 +218,7 @@ export async function POST(request: NextRequest) {
     processingRequests.clear();
   }
 }
+
+// Export the auth handler for GET and POST (for auth routes)
+export const GET = authHandler;
+export const POST_AUTH = authHandler; // Rename to avoid conflict with POST export
