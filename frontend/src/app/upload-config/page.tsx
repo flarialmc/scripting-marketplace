@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { ConfigGrid } from '@/components/ConfigGrid/ConfigGrid';
 import { listScripts } from '@/services/scripts';
@@ -19,6 +19,13 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', 
 const flarialLogo = "/images/flarial-logo.png";
 const FLARIAL_DISCORD_ID = "YOUR_DISCORD_SERVER_ID"; // Replace with your Flarial Discord server ID
 
+interface ConfigFormData {
+  id: string;
+  name: string;
+  version: string;
+  author: string;
+}
+
 export default function Home() {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [configs, setConfigs] = useState<Config[]>([]);
@@ -28,8 +35,18 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Scripts");
   const [canUpload, setCanUpload] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState<ConfigFormData>({
+    id: '',
+    name: '',
+    version: '',
+    author: '',
+  });
   const searchRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -59,11 +76,10 @@ export default function Home() {
               Authorization: `Bearer ${session.accessToken}`,
             },
           });
+          if (!response.ok) throw new Error('Failed to fetch guilds');
           const guilds = await response.json();
           const isMember = guilds.some((guild: any) => guild.id === FLARIAL_DISCORD_ID);
           setCanUpload(isMember);
-          
-          // Store membership status in localStorage for persistence
           localStorage.setItem(`discord_member_${session.user?.id}`, JSON.stringify(isMember));
         } catch (err) {
           setCanUpload(false);
@@ -99,14 +115,117 @@ export default function Home() {
     config.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleUploadClick = () => {
+  const handleFolderUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const uploadedFiles = Array.from(e.target.files || []);
+    setSelectedFiles(uploadedFiles);
+    validateFolder(uploadedFiles);
+  };
+
+  const validateFolder = (uploadedFiles: File[]) => {
+    const allowedExtensions = ['.json', '.png', '.flarial'];
+    const fileNames = uploadedFiles.map(file => file.webkitRelativePath.split('/').pop() || file.name);
+
+    const hasDisallowedFiles = uploadedFiles.some(file => {
+      const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+      return !allowedExtensions.includes(extension) || 
+             (extension === '.json' && file.name.toLowerCase() !== 'main.json') ||
+             (extension === '.png' && file.name.toLowerCase() !== 'icon.png');
+    });
+
+    if (hasDisallowedFiles) {
+      setError('Folder can only contain main.json, icon.png, and .flarial files.');
+      setSelectedFiles([]);
+      setShowForm(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const hasMainJson = fileNames.some(name => name.toLowerCase() === 'main.json');
+    const hasIcon = fileNames.some(name => name.toLowerCase() === 'icon.png');
+    const hasFlarial = fileNames.some(name => name.toLowerCase().endsWith('.flarial'));
+
+    if (!hasFlarial || !hasIcon) {
+      setError('Folder must contain at least one .flarial file and icon.png.');
+      setSelectedFiles([]);
+      setShowForm(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    if (!hasMainJson) {
+      setShowForm(true);
+    } else {
+      setShowForm(false);
+    }
+    setError(null);
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleUploadClick = async () => {
     if (status === "unauthenticated") {
       signIn("discord");
-    } else if (!canUpload) {
+      return;
+    }
+    if (!canUpload) {
       setError("You must be a member of the Flarial Discord server to upload.");
-    } else {
-      // Add your upload logic here
-      router.push('/upload'); // Example route
+      return;
+    }
+    if (selectedFiles.length === 0) {
+      setError("Please select a folder containing .flarial files, main.json, and icon.png.");
+      return;
+    }
+    if (showForm && (!formData.id || !formData.name)) {
+      setError("Please fill in the required fields (ID and Name) for main.json.");
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+    try {
+      const formDataToSend = new FormData();
+      let finalFiles = selectedFiles;
+
+      if (showForm) {
+        const mainJson = new File(
+          [JSON.stringify({ ...formData, createdAt: new Date().toISOString() }, null, 2)],
+          'main.json',
+          { type: 'application/json' }
+        );
+        finalFiles = [...selectedFiles, mainJson];
+      }
+
+      finalFiles.forEach(file => formDataToSend.append('files', file));
+      formDataToSend.append('configData', JSON.stringify({
+        id: formData.id || `${selectedOption.toLowerCase()}-${Date.now()}`,
+        name: formData.name || `New ${selectedOption}`,
+        version: formData.version || "1.0.0",
+        author: formData.author || session?.user?.name || "Unknown",
+      }));
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      const data = await response.json();
+      alert(data.message);
+      setSelectedFiles([]);
+      setShowForm(false);
+      setFormData({ id: '', name: '', version: '', author: '' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -156,19 +275,66 @@ export default function Home() {
               )}
             </div>
 
-            {/* Auth and Upload Button */}
+            {/* Auth and Upload Controls */}
             <div className="flex items-center space-x-4">
               {status === "authenticated" ? (
                 <>
                   <span className="text-white">Welcome, {session.user?.name}</span>
+                  <input
+                    type="file"
+                    // @ts-expect-error webkitdirectory is not in standard TS types
+                    webkitdirectory="true"
+                    directory=""
+                    multiple
+                    ref={fileInputRef}
+                    onChange={handleFolderUpload}
+                    className="text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:bg-[#2d2526] file:text-white file:border-0 file:hover:bg-[#3a3032]"
+                    disabled={!canUpload || isUploading}
+                  />
+                  {showForm && (
+                    <div className="flex flex-col space-y-2">
+                      <input
+                        type="text"
+                        name="id"
+                        value={formData.id}
+                        onChange={handleInputChange}
+                        placeholder="Config ID"
+                        className="p-2 bg-[#3a2f30] text-white rounded-md"
+                      />
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Config Name"
+                        className="p-2 bg-[#3a2f30] text-white rounded-md"
+                      />
+                      <input
+                        type="text"
+                        name="version"
+                        value={formData.version}
+                        onChange={handleInputChange}
+                        placeholder="Version"
+                        className="p-2 bg-[#3a2f30] text-white rounded-md"
+                      />
+                      <input
+                        type="text"
+                        name="author"
+                        value={formData.author}
+                        onChange={handleInputChange}
+                        placeholder="Author"
+                        className="p-2 bg-[#3a2f30] text-white rounded-md"
+                      />
+                    </div>
+                  )}
                   <button
                     onClick={handleUploadClick}
                     className={`px-4 py-2 rounded-md text-white ${
-                      canUpload ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 cursor-not-allowed'
+                      canUpload && !isUploading ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 cursor-not-allowed'
                     }`}
-                    disabled={!canUpload}
+                    disabled={!canUpload || isUploading}
                   >
-                    Upload {selectedOption}
+                    {isUploading ? "Uploading..." : `Upload ${selectedOption}`}
                   </button>
                   <button
                     onClick={() => signOut()}
