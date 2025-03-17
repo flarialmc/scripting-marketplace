@@ -39,7 +39,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
 
   const handleDownload = async () => {
     try {
-      const response = await getScriptDownloadResponse(script.id);
+      const response = await getScriptDownloadResponse(script.name);
       
       // Get filename from Content-Disposition header or fallback to script name with .lua extension
       const contentDisposition = response.headers.get('content-disposition');
