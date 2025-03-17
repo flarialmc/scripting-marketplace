@@ -1,0 +1,130 @@
+[
+    {
+        "name": "noshadows",
+        "value": false
+    },
+    {
+        "name": "fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Minecraft"
+    },
+    {
+        "name": "blurintensity",
+        "value": 0.6203373670578003
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "donotwait",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": true
+    },
+    {
+        "name": "limitblurfps",
+        "value": true
+    },
+    {
+        "name": "dynamicblurrquality",
+        "value": true
+    },
+    {
+        "name": "highqualityblur",
+        "value": false
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "vsync",
+        "value": false
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "anonymousApi",
+        "value": false
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": false
+    },
+    {
+        "name": "gui_font_scale",
+        "value": 1.0
+    },
+    {
+        "name": "centreCursor",
+        "value": true
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "ejectKeybind",
+        "value": "|"
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 1.0000030994415283
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "promotions",
+        "value": false
+    },
+    {
+        "name": "bufferingmode",
+        "value": "Double Buffering"
+    },
+    {
+        "name": "swapeffect",
+        "value": "FLIP_SEQUENTIAL"
+    },
+    {
+        "name": "modules_font_scale",
+        "value": 1.0
+    },
+    {
+        "name": "overrideFontWeight",
+        "value": false
+    },
+    {
+        "name": "nologoicon",
+        "value": false
+    },
+    {
+        "name": "fontWeight",
+        "value": "Normal"
+    },
+    {
+        "name": "nochaticon",
+        "value": false
+    }
+]
