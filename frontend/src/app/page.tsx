@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { ScriptGrid } from '@/components/ScriptGrid/ScriptGrid';
 import { ConfigGrid } from '@/components/ConfigGrid/ConfigGrid';
 import { listScripts } from '@/services/scripts';
@@ -17,6 +17,51 @@ export const dynamic = 'force-dynamic';
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '700'] });
 const flarialLogo = "/images/flarial-logo.png";
 
+// Memoize the SearchBar component to prevent unnecessary re-renders
+const SearchBar = memo(({ searchQuery, setSearchQuery, isSearchOpen, setIsSearchOpen, selectedOption }) => {
+  const searchRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setIsSearchOpen]);
+
+  return (
+    <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
+      <div
+        className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2 h-10 transition-all duration-200 ease-out"
+        style={{
+          width: isSearchOpen ? '250px' : '40px',
+          willChange: 'width',
+          transform: 'translateZ(0)', // Force GPU acceleration
+        }}
+      >
+        <input
+          type="text"
+          placeholder={`Search for ${selectedOption.toLowerCase()}...`}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onClick={() => setIsSearchOpen(true)}
+          className="bg-transparent text-white focus:outline-none w-full pl-8 opacity-0 transition-opacity duration-150 ease-out"
+          style={{ opacity: isSearchOpen ? 1 : 0 }}
+        />
+        <button
+          onClick={() => setIsSearchOpen((prev) => !prev)}
+          className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
+        >
+          <FaSearch size={18} className="text-white" />
+        </button>
+      </div>
+    </div>
+  );
+});
+SearchBar.displayName = 'SearchBar';
+
 export default function Home() {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [configs, setConfigs] = useState<Config[]>([]);
@@ -25,12 +70,29 @@ export default function Home() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Scripts");
-  const searchRef = useRef<HTMLDivElement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    async function fetchInitialData() {
+      try {
+        const scriptData = await listScripts();
+        const configData = await listConfigs();
+        setScripts(scriptData);
+        setConfigs(configData);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       try {
         if (selectedOption === "Scripts") {
           const data = await listScripts();
@@ -41,24 +103,23 @@ export default function Home() {
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load data');
+      } finally {
+        setIsLoading(false);
       }
     }
-    fetchData();
+    if (!isLoading) {
+      fetchData();
+    }
   }, [selectedOption]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
-        setIsSearchOpen(false);
-      }
       if (dropdownRef.current && event.target instanceof Node && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filteredScripts = scripts.filter(script => 
@@ -68,6 +129,34 @@ export default function Home() {
   const filteredConfigs = configs.filter(config => 
     config.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleUploadConfig = () => {
+    console.log("Config upload clicked");
+  };
+
+  if (isLoading) {
+    return (
+      <div 
+        className={`min-h-screen relative flex items-center justify-center ${spaceGrotesk.className}`}
+        style={{ backgroundImage: "url('/images/background.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+          style={{ willChange: 'transform' }}
+        >
+          <Image 
+            src="/images/flarial-logo.png" 
+            alt="Loading" 
+            width={50} 
+            height={50} 
+            className="rounded relative z-10"
+          />
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -85,9 +174,7 @@ export default function Home() {
             Browse and download community-created {selectedOption.toLowerCase()} for Flarial
           </p>
 
-          {/* Dropdown */}
           <div className="relative mt-2 flex items-center space-x-4" ref={dropdownRef}>
-            {/* Dropdown Menu */}
             <div className="relative">
               <button
                 className="flex items-center px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
@@ -114,32 +201,24 @@ export default function Home() {
                 </div>
               )}
             </div>
+
+            {selectedOption === "Configs" && (
+              <button
+                className="px-4 py-2 bg-[#2d2526] text-white rounded-md shadow-md hover:bg-[#3a3032] border border-white/20"
+                onClick={handleUploadConfig}
+              >
+                Upload Config
+              </button>
+            )}
           </div>
 
-          <div className="absolute top-[72px] right-6 flex items-center" ref={searchRef}>
-            <motion.div
-              initial={{ width: 40, height: 40 }}
-              animate={{ width: isSearchOpen ? 250 : 40, height: 40 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="relative flex items-center bg-[#201a1b]/80 rounded-lg shadow-lg px-2"
-            >
-              <motion.input
-                type="text"
-                placeholder={`Search for ${selectedOption.toLowerCase()}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`bg-transparent text-white focus:outline-none transition-all ${
-                  isSearchOpen ? "opacity-100 w-full pl-8" : "opacity-0 w-0"
-                }`}
-              />
-              <button
-                onClick={() => setIsSearchOpen((prev) => !prev)}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center"
-              >
-                <FaSearch size={18} className="text-white" />
-              </button>
-            </motion.div>
-          </div>
+          <SearchBar 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isSearchOpen={isSearchOpen}
+            setIsSearchOpen={setIsSearchOpen}
+            selectedOption={selectedOption}
+          />
         </div>
 
         {error ? (

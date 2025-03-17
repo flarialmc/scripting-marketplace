@@ -2,6 +2,15 @@
 
 import { useState, ChangeEvent, useEffect } from 'react';
 import Image from 'next/image';
+import { signIn, signOut, useSession, SessionProvider } from 'next-auth/react';
+import Link from 'next/link';
+import { Space_Grotesk } from 'next/font/google';
+
+const spaceGrotesk = Space_Grotesk({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 interface ConfigFormData {
   id: string;
@@ -10,72 +19,8 @@ interface ConfigFormData {
   author: string;
 }
 
-interface ConfigCardProps {
-  config: {
-    id: string;
-    name: string;
-    author: string;
-    createdAt: string;
-  };
-  iconPreview: string | null;
-}
-
-const ConfigCard = ({ config, iconPreview }: ConfigCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 transition-all hover:scale-[1.05] hover:z-10 shadow-md">
-      {/* Config Image with Hover Preview */}
-      <div 
-        className="relative w-full h-40 bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {iconPreview ? (
-          <Image
-            src={iconPreview}
-            alt="Config Image Preview"
-            unoptimized={true}
-            className="w-full h-full object-cover"
-            width={160}
-            height={160}
-          />
-        ) : (
-          <div className="text-gray-500">No Icon in Folder</div>
-        )}
-
-        {/* Hover Full Image Preview */}
-        {isHovered && iconPreview && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-              <div className="relative bg-[#201a1b] p-4 rounded-xl shadow-lg">
-                <Image
-                  src={iconPreview}
-                  alt="Full Config Image Preview"
-                  width={600}
-                  height={337}
-                  unoptimized={true}
-                  className="w-[600px] h-auto rounded-lg"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Config Info */}
-      <div className="flex justify-between mt-3">
-        <div className="p-2 bg-black/20 rounded-md text-gray-300 text-sm">
-          <p>Author: {config.author || 'Unknown'}</p>
-          <p>Name: {config.name || 'Unnamed Config'}</p>
-          <p>Uploaded: {config.createdAt}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function ConfigUploadPage() {
+function ConfigUploadInner() {
+  const { data: session, status } = useSession();
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ConfigFormData>({
@@ -87,6 +32,12 @@ export default function ConfigUploadPage() {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [iconPreview, setIconPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      setFormData(prev => ({ ...prev, author: session.user.name }));
+    }
+  }, [session]);
 
   const handleFolderUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = Array.from(e.target.files || []);
@@ -131,7 +82,7 @@ export default function ConfigUploadPage() {
 
   useEffect(() => {
     const iconFile = files.find(file => file.name === 'icon.png');
-    if (iconFile && iconFile.size > 0) { // Ensure it's not the default empty file
+    if (iconFile && iconFile.size > 0) {
       const reader = new FileReader();
       reader.onload = (e) => setIconPreview(e.target?.result as string);
       reader.readAsDataURL(iconFile);
@@ -145,10 +96,16 @@ export default function ConfigUploadPage() {
   };
 
   const handleSubmit = async () => {
+    if (!session) {
+      setError('Please sign in with Discord to submit a config');
+      return;
+    }
+
     setIsUploading(true);
     const formDataToSend = new FormData();
     files.forEach(file => formDataToSend.append('files', file));
     formDataToSend.append('configData', JSON.stringify(formData));
+    formDataToSend.append('discordId', session.user.id);
 
     try {
       const response = await fetch('/api/upload-config', {
@@ -172,94 +129,168 @@ export default function ConfigUploadPage() {
 
   const resetForm = () => {
     setFiles([]);
-    setFormData({ id: '', name: '', version: '', author: '' });
+    setFormData({ id: '', name: '', version: '', author: session?.user?.name || '' });
     setShowForm(false);
     setIconPreview(null);
     setError(null);
   };
 
-  // Config object for preview, updating in real-time
-  const previewConfig = {
-    id: formData.id,
-    name: formData.name,
-    author: formData.author,
-    createdAt: new Date().toLocaleDateString(), // Use current date for preview
-  };
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="relative">
+          <Image
+            src="/images/flarial-logo.png"
+            alt="Loading"
+            width={64}
+            height={64}
+            className="animate-spin"
+            unoptimized={true}
+          />
+          <p className="text-white mt-4 text-center">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#121212]">
-      <div className="max-w-4xl w-full p-6 bg-[#201a1b] rounded-lg shadow-md text-center">
-        <h1 className="text-3xl font-semibold text-white mb-4">Upload Config Folder</h1>
-        
-        <input
-          type="file"
-          // @ts-expect-error webkitdirectory is not in standard TS types
-          webkitdirectory="true"
-          directory=""
-          multiple
-          onChange={handleFolderUpload}
-          className="mb-4 w-full text-white bg-[#3a2f30] p-2 rounded-md cursor-pointer hover:bg-[#4C3F40]"
-        />
+    <div
+      className={`relative flex items-center justify-center min-h-screen ${spaceGrotesk.className}`}
+      style={{
+        backgroundImage: "url('/images/background.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-black/80 z-0" />
+      <div className="flex flex-col items-center justify-center w-full relative z-10">
+        <div className="max-w-5xl w-full p-6 rounded-lg shadow-md text-center bg-[#201a1b]/90">
+          {session && (
+            <div className="mb-6 flex items-center justify-center gap-4">
+              <Image
+                src="/images/flarial-logo.png"
+                alt="Flarial Scripts Logo"
+                width={64}
+                height={64}
+                unoptimized={true}
+              />
+              <h1 className="text-5xl font-bold text-white">Flarial Marketplace</h1>
+            </div>
+          )}
 
-        {error && <p className="text-red-400 mb-4">{error}</p>}
+          {session ? (
+            <h2 className="text-xl font-semibold text-white mb-6">Submit Config</h2>
+          ) : (
+            <h2 className="text-xl font-semibold text-white mb-6">Sign-in to Submit Config</h2>
+          )}
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Form Section */}
-          <div className="flex-1">
-            {showForm && (
-              <div className="mb-4 p-4 bg-black/20 rounded-md">
-                <h2 className="text-white mb-2">Create main.json</h2>
-                <input
-                  type="text"
-                  name="id"
-                  value={formData.id}
-                  onChange={handleInputChange}
-                  placeholder="Config ID"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Config Name"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="version"
-                  value={formData.version}
-                  onChange={handleInputChange}
-                  placeholder="Version"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
-                <input
-                  type="text"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleInputChange}
-                  placeholder="Author"
-                  className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
-                />
+          <div className="mb-6">
+            {session ? (
+              <div className="flex items-center justify-center gap-4">
+                <p className="text-white">Signed in as {session.user.name}</p>
+                <button
+                  onClick={() => signOut()}
+                  className="bg-[#5865F2] text-white px-4 py-2 rounded-md hover:bg-[#4752C4]"
+                >
+                  Sign out
+                </button>
               </div>
+            ) : (
+              <button
+                onClick={() => signIn('discord')}
+                className="bg-[#5865F2] text-white px-6 py-2 rounded-md hover:bg-[#4752C4]"
+              >
+                Sign in with Discord
+              </button>
             )}
+          </div>
 
+          {session && (
+            <div className="mb-4 w-full">
+              <label className="w-full text-white bg-[#2f2f2f] p-2 rounded-md cursor-pointer hover:bg-[#3f3f3f] transition-colors flex items-center justify-center">
+                Choose Files
+                <input
+                  type="file"
+                  webkitdirectory="true"
+                  directory=""
+                  multiple
+                  onChange={handleFolderUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          )}
+
+          {error && <p className="text-red-400 mb-4">{error}</p>}
+
+          {showForm && (
+            <div className="mb-4 p-4 bg-black/20 rounded-md w-full">
+              <h2 className="text-white mb-2">Create main.json</h2>
+              <input
+                type="text"
+                name="id"
+                value={formData.id}
+                onChange={handleInputChange}
+                placeholder="Config ID"
+                className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
+              />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Config Name"
+                className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
+              />
+              <input
+                type="text"
+                name="version"
+                value={formData.version}
+                onChange={handleInputChange}
+                placeholder="Version"
+                className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
+              />
+              <input
+                type="text"
+                name="author"
+                value={formData.author}
+                onChange={handleInputChange}
+                placeholder="Author"
+                className="w-full mb-2 p-2 bg-[#3a2f30] text-white rounded-md"
+                disabled={!!session}
+              />
+            </div>
+          )}
+
+          {session && (
             <button
               onClick={handleSubmit}
               disabled={isUploading || files.length === 0 || (showForm && !formData.id)}
-              className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all"
+              className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all mb-6 w-full max-w-xs mx-auto"
             >
               {isUploading ? 'Uploading...' : 'Submit Config'}
             </button>
-          </div>
-
-          {/* Preview Section */}
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold text-white mb-2">Preview</h2>
-            <ConfigCard config={previewConfig} iconPreview={iconPreview} />
-          </div>
+          )}
         </div>
+
+        {session && (
+          <div className="mt-8 w-full flex justify-center">
+            <Link href="/">
+              <button className="bg-[#2f2f2f] text-white px-6 py-2 rounded-md hover:bg-[#3f3f3f] transition-colors">
+                Back
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+export default function ConfigUploadPage() {
+  return (
+    <SessionProvider>
+      <ConfigUploadInner />
+    </SessionProvider>
   );
 }
