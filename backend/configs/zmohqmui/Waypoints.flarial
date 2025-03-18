@@ -1,0 +1,218 @@
+[
+    {
+        "name": "showmeters",
+        "value": true
+    },
+    {
+        "name": "distance",
+        "value": 1000.0
+    },
+    {
+        "name": "bgrounding",
+        "value": 10.0
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "total",
+        "value": 0.0
+    },
+    {
+        "name": "bgcolor",
+        "value": "000000"
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "textuse",
+        "value": true
+    },
+    {
+        "name": "bgrgb",
+        "value": false
+    },
+    {
+        "name": "borderthickness",
+        "value": 2.5
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "bgopacity",
+        "value": 0.25
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "bordercolor",
+        "value": "000000"
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "borderrgb",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "borderopacity",
+        "value": 1.0
+    },
+    {
+        "name": "textcolor",
+        "value": "000000"
+    },
+    {
+        "name": "textrgb",
+        "value": false
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "textopacity",
+        "value": 1.0
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "bguse",
+        "value": true
+    },
+    {
+        "name": "borderuse",
+        "value": true
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "border",
+        "value": true
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "percentageX",
+        "value": 0.0
+    },
+    {
+        "name": "percentageY",
+        "value": 0.0
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "textscale",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6499999761581421
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.003000000026077032
+    }
+]
