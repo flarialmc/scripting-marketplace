@@ -1,0 +1,122 @@
+[
+    {
+        "name": "promotions",
+        "value": true
+    },
+    {
+        "name": "noshadows",
+        "value": false
+    },
+    {
+        "name": "fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "blurintensity",
+        "value": 2.0000174045562744
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": true
+    },
+    {
+        "name": "donotwait",
+        "value": true
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "vsync",
+        "value": false
+    },
+    {
+        "name": "bufferingmode",
+        "value": ""
+    },
+    {
+        "name": "swapeffect",
+        "value": ""
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "anonymousApi",
+        "value": false
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "gui_font_scale",
+        "value": 0.9999983906745911
+    },
+    {
+        "name": "watermark",
+        "value": true
+    },
+    {
+        "name": "centreCursor",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "ejectKeybind",
+        "value": ""
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 1.000004768371582
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "modules_font_scale",
+        "value": 0.9999983906745911
+    },
+    {
+        "name": "nologoicon",
+        "value": false
+    },
+    {
+        "name": "overrideFontWeight",
+        "value": false
+    },
+    {
+        "name": "fontWeight",
+        "value": ""
+    },
+    {
+        "name": "nochaticon",
+        "value": false
+    },
+    {
+        "name": "currentConfig",
+        "value": ""
+    }
+]
