@@ -39,21 +39,19 @@ export function ScriptCard({ script }: ScriptCardProps) {
 
   const handleDownload = async () => {
     try {
-      const response = await getScriptDownloadResponse(script.name);
+      // Updated to include script.type
+      const response = await getScriptDownloadResponse(script.name, script.type);
       
-      // Get filename from Content-Disposition header or fallback to script name with .lua extension
       const contentDisposition = response.headers.get('content-disposition');
       const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/) || [];
       const filename = filenameMatch[1] || `${script.name}.lua`;
       
-      // Create blob from response and trigger download
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       
-      // Trigger download and cleanup
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -72,6 +70,8 @@ export function ScriptCard({ script }: ScriptCardProps) {
           <div>
             <h2 className="text-lg font-semibold mb-1 text-gray-300">{script.name}</h2>
             <p className="text-sm text-gray-400">by {script.author}</p>
+            {/* Optional: Display script type */}
+            <p className="text-xs text-gray-500">Type: {script.type}</p>
           </div>
         </div>
 
@@ -80,7 +80,8 @@ export function ScriptCard({ script }: ScriptCardProps) {
         <div className="flex items-center justify-between mt-2">
           <div className="relative inline-flex rounded">
             <button
-              onClick={() => window.location.href = `minecraft://flarial-scripting?scriptName=${script.name}`}
+              // Updated import URL - adjust if your Minecraft protocol needs type
+              onClick={() => window.location.href = `minecraft://flarial-scripting?scriptName=${script.name}&type=${script.type}`}
               className="flex items-center gap-2 bg-[#3a2f30] text-white px-4 py-2 text-sm hover:bg-[#4C3F40] transition-all duration-200 rounded-l font-medium"
               aria-label="Import script to Minecraft"
               title="Import directly into Minecraft"

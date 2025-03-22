@@ -8,4 +8,5 @@ export interface Script {
   createdAt: string;
   updatedAt: string;
   imageUrl:string;
+  type: 'module' | 'command'; 
 }

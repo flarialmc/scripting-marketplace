@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-        "fmt"
+	"fmt"
 	"backend/internal/api/handlers/scripts"
 	"backend/internal/api/handlers/configs"
 )
@@ -49,18 +49,27 @@ func corsMiddleware(next http.Handler) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 
-	scriptHandler := scripts.NewScriptHandler("scripts")
+	// Updated to use two directories for scripts
+	// Also fixed directory names to plural for consistency
+	scriptHandler := scripts.NewScriptHandler("scripts/module", "scripts/command")
 	configHandler := configs.NewConfigHandler("configs")
     
-    mux.HandleFunc("/api/configs", configHandler.HandleListConfigs)
+	mux.HandleFunc("/api/configs", configHandler.HandleListConfigs)
 	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/api/scripts", scriptHandler.HandleListScripts)
 	mux.HandleFunc("/api/scripts/", func(w http.ResponseWriter, r *http.Request) {
-		if len(r.URL.Path) > len("/api/scripts/") {
-			if strings.HasSuffix(r.URL.Path, "/download") {
-				scriptHandler.HandleDownloadScript(w, r)
+		path := strings.TrimPrefix(r.URL.Path, "/api/scripts/")
+		if len(path) > 0 {
+			parts := strings.Split(path, "/")
+			if len(parts) >= 2 { // Expecting at least type/scriptname
+				// Handle both /download and /download/
+				if strings.HasSuffix(r.URL.Path, "/download") || strings.HasSuffix(r.URL.Path, "/download/") {
+					scriptHandler.HandleDownloadScript(w, r)
+				} else {
+					scriptHandler.HandleGetScript(w, r)
+				}
 			} else {
-				scriptHandler.HandleGetScript(w, r)
+				http.NotFound(w, r)
 			}
 		} else {
 			http.NotFound(w, r)

@@ -2,7 +2,8 @@ import { Script } from '@/types/script';
 import { API_CONFIG } from '@/config/api';
 
 interface ScriptsResponse {
-  scripts: Script[];
+  modules: Script[];
+  commands: Script[];
 }
 
 export async function listScripts(): Promise<Script[]> {
@@ -20,18 +21,18 @@ export async function listScripts(): Promise<Script[]> {
     }
     
     const data = await response.json() as ScriptsResponse;
-    return data.scripts || [];
-    
+    // Combine modules and commands into a single array
+    return [...(data.modules || []), ...(data.commands || [])];
   } catch (error) {
     console.error('Error fetching scripts:', error);
     return []; // Return empty array instead of throwing to prevent UI errors
   }
 }
 
-export async function getScriptDownloadResponse(scriptId: string): Promise<Response> {
+export async function getScriptDownloadResponse(name: string, scriptType: 'module' | 'command'): Promise<Response> {
   try {
     const response = await fetch(
-      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.DOWNLOAD(scriptId)}`,
+      `${API_CONFIG.BASE_URL}/api/scripts/${scriptType}/${name}/download`,
       {
         method: 'GET',
         cache: 'no-store',
