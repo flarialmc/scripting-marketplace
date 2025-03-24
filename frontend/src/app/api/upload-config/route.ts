@@ -1,11 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Store to track user uploads with timestamps
+// Store to track user uploads and configs
 const userUploadTracker = new Map<string, number>(); // Key: identifier, Value: timestamp (ms)
+const ipConfigTracker = new Map<string, string>(); // Key: IP, Value: config name
+const discordConfigTracker = new Map<string, string>(); // Key: Discord ID, Value: config name
 const processingRequests = new Set<string>();
 
 // Time limit: 24 hours in milliseconds
-const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000; // Adjust for testing (e.g., 1 * 60 * 1000 for 1 minute)
+const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
+
+// Bad words list (will add more as needed)
+const BAD_WORDS = [     
+  "nigger", "nigga", "fuck", "shit", "bitch", "asshole", "cunt", "faggot", "retard", "whore",
+  "dick", "pussy", "bastard", "slut", "damn", "hell", "cock", "tits", "prick", "chink",
+  "spic", "kike", "wop", "gook", "jap", "cracker", "freak", "douche", "skank", "tramp",
+  "piss", "crap", "twat", "wanker", "arse", "bollocks", "bugger", "fart", "shag", "tosser",
+  "dyke", "queer", "homo", "coon", "redskin", "wetback", "beaner", "gringo", "honky", "mick",
+  "dago", "kraut", "yid", "paki", "raghead", "sandnigger", "towelhead", "cameljockey", "zipperhead", "slope",
+  "nazi", "klan", "savage", "injun", "negro", "mulatto", "halfbreed", "mongoloid", "darkie", "sambo",
+  "jewboy", "heeb", "shylock", "gyp", "gypsy", "tranny", "shemale", "pedophile", "rapist", "pervert",
+  "skullfuck", "shithead", "fuckface", "dumbass", "jackass", "motherfucker", "cocksucker", "asswipe", "shitbag", "cum",
+  "jizz", "spunk", "clit", "smegma", "buttfuck", "rimjob", "blowjob", "handjob", "fucktard", "dipshit",
+  "pissflaps", "shitstain", "fuckwit", "arsehole", "bellend", "knob", "prat", "git", "minger", "slapper",
+  "cholo", "oreo", "uncle tom", "house nigger", "porch monkey", "jungle bunny", "tar baby", "pickaninny", "coonass", "nigglet",
+  "fudgepacker", "carpetmuncher", "lezbo", "breeder", "pansy", "poof", "fairy", "butch", "sissy", "nancy",
+  "whigger", "wigger", "whitey", "bluegum", "buckwheat", "jigaboo", "zip coon", "moon cricket", "spook", "boogie",
+  "fuckoff", "piss off", "shitface", "asshat", "cocktease", "cumslut", "dickhead", "fucker", "shithead", "twatface",
+  "bint", "slag", "tart","weasel", "scumbag"
+].map(word => word.toLowerCase());
 
 // Helper to get unique user identifier
 function getUserIdentifier(request: NextRequest): string {
@@ -15,71 +37,131 @@ function getUserIdentifier(request: NextRequest): string {
   return `${ip}-${cookieId}`;
 }
 
+// Helper to get Discord ID from formData
+function getDiscordId(formData: FormData): string | null {
+  return formData.get('discordId') as string | null;
+}
+
 // Helper to generate ID from name
 function generateIdFromName(name: string): string {
-  return name.replace(/\s+/g, '').toLowerCase(); // Remove all spaces and convert to lowercase
+  return name.replace(/\s+/g, '').toLowerCase();
+}
+
+// Helper to check for bad words
+function containsBadWords(name: string): boolean {
+  const normalizedName = name.toLowerCase();
+  return BAD_WORDS.some(badWord => normalizedName.includes(badWord));
+}
+
+// Helper to check for existing PRs with the same name (case-insensitive)
+async function checkExistingPR(name: string, githubToken: string): Promise<boolean> {
+  const repoOwner = 'flarialmc';
+  const repoName = 'scripting-marketplace';
+  const githubApiBase = 'https://api.github.com';
+  const headers = {
+    Authorization: `Bearer ${githubToken}`,
+    Accept: 'application/vnd.github+json',
+  };
+
+  const normalizedName = generateIdFromName(name);
+  const prsResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/pulls?state=all`, { headers });
+  if (!prsResponse.ok) {
+    console.error(`Failed to fetch PRs: ${await prsResponse.text()}`);
+    return false;
+  }
+  const prs = await prsResponse.json();
+  return prs.some((pr: any) => generateIdFromName(pr.title.replace('Add config: ', '')) === normalizedName);
+}
+
+// Helper to send Discord webhook notification
+async function sendWebhookNotification(ip: string, configName: string, username: string, iconFile?: File) {
+  const webhookUrl = process.env.WEBHOOK;
+  if (!webhookUrl) {
+    console.error('Webhook URL not configured in .env');
+    return;
+  }
+
+  const embed: any = {
+    title: 'New Config Uploaded',
+    fields: [
+      { name: 'Config Name', value: configName, inline: true },
+      { name: 'Username', value: username, inline: true },
+      { name: 'IP', value: ip, inline: true },
+    ],
+    color: 0x00ff00, // Green
+    timestamp: new Date().toISOString(),
+  };
+
+  if (iconFile && iconFile.size > 0) {
+    const iconBase64 = Buffer.from(await iconFile.arrayBuffer()).toString('base64');
+    embed.thumbnail = { url: `data:image/png;base64,${iconBase64}` };
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ embeds: [embed] }),
+    });
+    if (!response.ok) throw new Error(await response.text());
+    console.log('Webhook notification sent successfully');
+  } catch (error) {
+    console.error('Failed to send webhook notification:', error);
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Step 1: Identify the user and check cooldown
     const userIdentifier = getUserIdentifier(request);
-    console.log(`User identifier: ${userIdentifier}`);
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
+    const formData = await request.formData();
+    const discordId = getDiscordId(formData);
+    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, Discord ID: ${discordId || 'none'}`);
+
+    const files = formData.getAll('files') as File[];
+    const configData = JSON.parse(formData.get('configData') as string);
+    const name = configData.name?.trim();
+    if (!name) throw new Error('Config name is required');
+    const generatedId = generateIdFromName(name);
+
+    if (containsBadWords(name)) {
+      console.log(`Blocked upload: Name "${name}" contains prohibited words`);
+      return NextResponse.json({ error: 'Config name contains prohibited words' }, { status: 400 });
+    }
+
+    if (ipConfigTracker.has(ip)) {
+      console.log(`Blocked upload: IP ${ip} already has config "${ipConfigTracker.get(ip)}"`);
+      return NextResponse.json({ error: 'Only one config upload allowed per IP' }, { status: 403 });
+    }
+
+    if (discordId && discordConfigTracker.has(discordId)) {
+      console.log(`Blocked upload: Discord user ${discordId} already has config "${discordConfigTracker.get(discordId)}"`);
+      return NextResponse.json({ error: 'Only one config upload allowed per Discord user' }, { status: 403 });
+    }
+
+    const githubToken = process.env.GITHUB_TOKEN;
+    if (!githubToken) throw new Error('GitHub token not configured');
+    const prExists = await checkExistingPR(name, githubToken);
+    if (prExists) {
+      console.log(`Blocked upload: PR with name "${name}" (ID: ${generatedId}) already exists`);
+      return NextResponse.json({ error: 'A pull request with this config name already exists' }, { status: 409 });
+    }
 
     const lastUploadTime = userUploadTracker.get(userIdentifier);
     const currentTime = Date.now();
-    
-    if (lastUploadTime) {
-      const timeSinceLastUpload = currentTime - lastUploadTime;
-      console.log(`Last upload time: ${lastUploadTime}, Time since: ${timeSinceLastUpload}ms`);
-      
-      if (timeSinceLastUpload < UPLOAD_COOLDOWN) {
-        const remainingTime = Math.ceil((UPLOAD_COOLDOWN - timeSinceLastUpload) / (60 * 1000)); // in minutes
-        console.log(`Cooldown active. Remaining time: ${remainingTime} minutes`);
-        return NextResponse.json(
-          { error: `Upload limit reached. Please wait ${remainingTime} minutes before uploading again.` },
-          { status: 403 }
-        );
-      } else {
-        console.log('Cooldown expired, allowing new upload');
-      }
-    } else {
-      console.log('No previous upload found for this user');
+    if (lastUploadTime && (currentTime - lastUploadTime) < UPLOAD_COOLDOWN) {
+      const remainingTime = Math.ceil((UPLOAD_COOLDOWN - (currentTime - lastUploadTime)) / (60 * 1000));
+      return NextResponse.json(
+        { error: `Upload limit reached. Please wait ${remainingTime} minutes before uploading again.` },
+        { status: 403 }
+      );
     }
 
-    // Step 2: Parse request data
-    const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
-    const configData = JSON.parse(formData.get('configData') as string);
-
-    // Step 3: Determine folder name and ID
-    let folderName = '';
-    let generatedId = '';
-    const mainJsonFile = files.find(f => f.name === 'main.json');
-    if (mainJsonFile) {
-      const mainJsonText = await mainJsonFile.text();
-      const mainJson = JSON.parse(mainJsonText) as { name?: string };
-      const name = configData.name?.trim() || mainJson.name?.trim() || `config-${Date.now()}`;
-      generatedId = generateIdFromName(name); // Generate ID from name
-      folderName = generatedId; // Use generated ID as folder name
-    } else {
-      const name = configData.name?.trim() || `config-${Date.now()}`;
-      generatedId = generateIdFromName(name); // Generate ID from name
-      folderName = generatedId; // Use generated ID as folder name
-    }
-    if (!folderName) throw new Error('Invalid folder name');
-    console.log(`Folder name: ${folderName}, Generated ID: ${generatedId}`);
-
-    // Step 4: Check for duplicate processing
+    const folderName = generatedId;
     if (processingRequests.has(folderName)) {
-      console.log(`Duplicate upload detected for folder: ${folderName}`);
       return NextResponse.json({ error: 'Upload already in progress' }, { status: 429 });
     }
     processingRequests.add(folderName);
-
-    // Step 5: GitHub setup
-    const githubToken = process.env.GITHUB_TOKEN;
-    if (!githubToken) throw new Error('GitHub token not configured');
 
     const repoOwner = 'flarialmc';
     const repoName = 'scripting-marketplace';
@@ -92,32 +174,29 @@ export async function POST(request: NextRequest) {
       'Content-Type': 'application/json',
     };
 
-    // Step 6: Get the latest commit SHA
     const refResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/ref/heads/${baseBranch}`, { headers });
     if (!refResponse.ok) throw new Error(`Failed to get base branch ref: ${await refResponse.text()}`);
     const refData = await refResponse.json();
     const baseSha = refData.object.sha;
-    console.log(`Base SHA: ${baseSha}`);
 
-    // Step 7: Create a new branch
     const createBranchResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ ref: `refs/heads/${newBranch}`, sha: baseSha }),
     });
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
-    console.log(`Branch created: ${newBranch}`);
 
-    // Step 8: Prepare files for commit (including auto-generated main.json if needed)
-    const updatedFiles = mainJsonFile ? files : [
-      ...files,
-      new File([JSON.stringify({
-        id: generatedId, // Use generated ID
-        name: configData.name,
-        version: configData.version,
-        author: configData.author,
-        createdAt: new Date().toISOString(),
-      }, null, 2)], 'main.json', { type: 'application/json' }),
+    // Always generate main.json from form data
+    const mainJsonContent = JSON.stringify({
+      id: generatedId,
+      name: configData.name,
+      version: configData.version,
+      author: configData.author,
+      createdAt: new Date().toISOString(),
+    }, null, 2);
+    const updatedFiles = [
+      new File([mainJsonContent], 'main.json', { type: 'application/json' }),
+      ...files.filter(f => f.name !== 'main.json'), // Override existing main.json if present
     ];
 
     const treeItems = [];
@@ -125,8 +204,6 @@ export async function POST(request: NextRequest) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
       const baseFileName = file.name.split('/').pop() || file.name;
       const filePath = `backend/configs/${folderName}/${baseFileName}`;
-      console.log(`Staging file: ${filePath}`);
-      
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
         method: 'POST',
         headers,
@@ -137,7 +214,6 @@ export async function POST(request: NextRequest) {
       treeItems.push({ path: filePath, mode: '100644', type: 'blob', sha: blobData.sha });
     }
 
-    // Step 9: Create new tree and commit
     const treeResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/trees`, {
       method: 'POST',
       headers,
@@ -154,7 +230,6 @@ export async function POST(request: NextRequest) {
     if (!commitResponse.ok) throw new Error(`Failed to create commit: ${await commitResponse.text()}`);
     const commitData = await commitResponse.json();
 
-    // Step 10: Update branch reference
     const updateRefResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs/heads/${newBranch}`, {
       method: 'PATCH',
       headers,
@@ -162,7 +237,6 @@ export async function POST(request: NextRequest) {
     });
     if (!updateRefResponse.ok) throw new Error(`Failed to update branch ref: ${await updateRefResponse.text()}`);
 
-    // Step 11: Create pull request
     const prResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/pulls`, {
       method: 'POST',
       headers,
@@ -174,18 +248,19 @@ export async function POST(request: NextRequest) {
       }),
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
-    console.log('Pull request created successfully');
 
-    // Step 12: Record upload timestamp
+    // Send Discord webhook notification
+    const iconFile = updatedFiles.find(f => f.name === 'icon.png');
+    await sendWebhookNotification(ip, name, configData.author || 'Unknown', iconFile);
+
+    ipConfigTracker.set(ip, folderName);
+    if (discordId) discordConfigTracker.set(discordId, folderName);
     userUploadTracker.set(userIdentifier, currentTime);
-    console.log(`Upload recorded for ${userIdentifier} at ${currentTime}`);
 
-    // Step 13: Set cookie and return response
     const response = NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });
     if (!request.cookies.get('user_id')) {
       response.cookies.set('user_id', userIdentifier.split('-')[1], { httpOnly: true, maxAge: 60 * 60 * 24 * 365 });
     }
-
     return response;
   } catch (error) {
     console.error('API error:', error);
@@ -195,6 +270,5 @@ export async function POST(request: NextRequest) {
     );
   } finally {
     processingRequests.clear();
-    console.log('Processing requests cleared');
   }
 }
