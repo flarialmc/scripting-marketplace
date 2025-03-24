@@ -36,7 +36,6 @@ interface DiscordEmbed {
   fields: { name: string; value: string; inline: boolean }[];
   color: number;
   timestamp: string;
-  thumbnail?: { url: string };
 }
 
 // GitHub PR interface (simplified)
@@ -62,9 +61,9 @@ function generateIdFromName(name: string): string {
   return name.replace(/\s+/g, '').toLowerCase();
 }
 
-// Helper to check for bad words
+// Helper to check for bad words anywhere in the name
 function containsBadWords(name: string): boolean {
-  const normalizedName = name.toLowerCase();
+  const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   return BAD_WORDS.some(badWord => normalizedName.includes(badWord));
 }
 
@@ -88,8 +87,8 @@ async function checkExistingPR(name: string, githubToken: string): Promise<boole
   return prs.some(pr => generateIdFromName(pr.title.replace('Add config: ', '')) === normalizedName);
 }
 
-// Helper to send Discord webhook notification
-async function sendWebhookNotification(ip: string, configName: string, username: string, iconFile?: File) {
+// Helper to send Discord webhook notification (no icon)
+async function sendWebhookNotification(ip: string, configName: string, username: string) {
   const webhookUrl = process.env.WEBHOOK;
   if (!webhookUrl) {
     console.error('Webhook URL not configured in .env');
@@ -107,18 +106,15 @@ async function sendWebhookNotification(ip: string, configName: string, username:
     timestamp: new Date().toISOString(),
   };
 
-  if (iconFile && iconFile.size > 0) {
-    const iconBase64 = Buffer.from(await iconFile.arrayBuffer()).toString('base64');
-    embed.thumbnail = { url: `data:image/png;base64,${iconBase64}` };
-  }
-
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ embeds: [embed] }),
     });
-    if (!response.ok) throw new Error(await response.text());
+    if (!response.ok) {
+      throw new Error(`Webhook failed: ${await response.text()}`);
+    }
     console.log('Webhook notification sent successfully');
   } catch (error) {
     console.error('Failed to send webhook notification:', error);
@@ -264,9 +260,8 @@ export async function POST(request: NextRequest) {
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
 
-    // Send Discord webhook notification
-    const iconFile = updatedFiles.find(f => f.name === 'icon.png');
-    await sendWebhookNotification(ip, name, configData.author || 'Unknown', iconFile);
+    // Send Discord webhook notification (no icon)
+    await sendWebhookNotification(ip, name, configData.author || 'Unknown');
 
     ipConfigTracker.set(ip, folderName);
     if (discordId) discordConfigTracker.set(discordId, folderName);
