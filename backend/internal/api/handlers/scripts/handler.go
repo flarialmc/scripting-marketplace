@@ -12,9 +12,18 @@ import (
 )
 
 type ScriptHandler struct {
-    moduleDir  string
-    commandDir string
-    nameToFile map[string]map[string]string
+    moduleDir   string
+    commandDir  string
+    nameToFile  map[string]map[string]string
+    moduleScripts  []map[string]interface{}
+    commandScripts []map[string]interface{}
+}
+
+type ScriptMetadata struct {
+    Name        string
+    Description string
+    Author      string
+    Type        string
 }
 
 func NewScriptHandler(moduleDir, commandDir string) *ScriptHandler {
@@ -31,11 +40,24 @@ func NewScriptHandler(moduleDir, commandDir string) *ScriptHandler {
     
     log.Printf("Initializing script handler with module directory: %s", moduleAbsPath)
     log.Printf("Initializing script handler with command directory: %s", commandAbsPath)
-    return &ScriptHandler{
+    
+    h := &ScriptHandler{
         moduleDir:  moduleAbsPath,
         commandDir: commandAbsPath,
         nameToFile: make(map[string]map[string]string),
     }
+    
+    // Load scripts once during initialization
+    h.moduleScripts, err = h.listScripts(moduleAbsPath, "module")
+    if err != nil {
+        log.Printf("Error loading module scripts: %v", err)
+    }
+    h.commandScripts, err = h.listScripts(commandAbsPath, "command")
+    if err != nil {
+        log.Printf("Error loading command scripts: %v", err)
+    }
+    
+    return h
 }
 
 func (h *ScriptHandler) HandleCORS(w http.ResponseWriter, r *http.Request) {
@@ -49,13 +71,6 @@ func (h *ScriptHandler) HandleCORS(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusOK)
         return
     }
-}
-
-type ScriptMetadata struct {
-    Name        string
-    Description string
-    Author      string
-    Type        string
 }
 
 func (h *ScriptHandler) listScripts(dir string, scriptType string) ([]map[string]interface{}, error) {
@@ -157,24 +172,10 @@ func (h *ScriptHandler) HandleListScripts(w http.ResponseWriter, r *http.Request
         return
     }
 
-    moduleScripts, err := h.listScripts(h.moduleDir, "module")
-    if err != nil {
-        log.Printf("Error reading module directory: %v", err)
-        http.Error(w, "Failed to read module directory", http.StatusInternalServerError)
-        return
-    }
-
-    commandScripts, err := h.listScripts(h.commandDir, "command")
-    if err != nil {
-        log.Printf("Error reading command directory: %v", err)
-        http.Error(w, "Failed to read command directory", http.StatusInternalServerError)
-        return
-    }
-
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(map[string]interface{}{
-        "modules":  moduleScripts,
-        "commands": commandScripts,
+        "module":  h.moduleScripts,
+        "command": h.commandScripts,
     })
 }
 
@@ -185,16 +186,7 @@ func (h *ScriptHandler) getScriptBaseDir(scriptType string) string {
     return h.commandDir
 }
 
-func (h *ScriptHandler) ensureScriptsLoaded(scriptType string) error {
-    if _, exists := h.nameToFile[scriptType]; !exists {
-        dir := h.getScriptBaseDir(scriptType)
-        _, err := h.listScripts(dir, scriptType)
-        if err != nil {
-            return err
-        }
-    }
-    return nil
-}
+// Removed ensureScriptsLoaded since scripts are loaded at initialization
 
 func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodGet {
@@ -211,12 +203,6 @@ func (h *ScriptHandler) HandleGetScript(w http.ResponseWriter, r *http.Request) 
     scriptType, scriptName := parts[0], parts[1]
     if scriptType != "module" && scriptType != "command" {
         http.Error(w, "Invalid script type - must be 'module' or 'command'", http.StatusBadRequest)
-        return
-    }
-
-    if err := h.ensureScriptsLoaded(scriptType); err != nil {
-        log.Printf("Error loading scripts for %s: %v", scriptType, err)
-        http.Error(w, "Failed to load scripts", http.StatusInternalServerError)
         return
     }
 
@@ -283,12 +269,6 @@ func (h *ScriptHandler) HandleDownloadScript(w http.ResponseWriter, r *http.Requ
     
     if scriptType != "module" && scriptType != "command" {
         http.Error(w, "Invalid script type - must be 'module' or 'command'", http.StatusBadRequest)
-        return
-    }
-
-    if err := h.ensureScriptsLoaded(scriptType); err != nil {
-        log.Printf("Error loading scripts for %s: %v", scriptType, err)
-        http.Error(w, "Failed to load scripts", http.StatusInternalServerError)
         return
     }
 
