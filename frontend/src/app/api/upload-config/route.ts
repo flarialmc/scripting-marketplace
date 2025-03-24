@@ -12,7 +12,7 @@ const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
 // Bad words list (expand as needed)
 const BAD_WORDS = [     
   "nigger", "nigga", "fuck", "shit", "bitch", "asshole", "cunt", "faggot", "retard", "whore",
-  "dick", "pussy", "bastard", "slut", "damn", "hell", "cock", "tits", "prick", "chink",
+  "dick", "pussy", "bastard", "slut", "hell", "cock", "tits", "prick", "chink",
   "spic", "kike", "wop", "gook", "jap", "cracker", "freak", "douche", "skank", "tramp",
   "piss", "crap", "twat", "wanker", "arse", "bollocks", "bugger", "fart", "shag", "tosser",
   "dyke", "queer", "homo", "coon", "redskin", "wetback", "beaner", "gringo", "honky", "mick",
@@ -22,7 +22,7 @@ const BAD_WORDS = [
   "skullfuck", "shithead", "fuckface", "dumbass", "jackass", "motherfucker", "cocksucker", "asswipe", "shitbag", "cum",
   "jizz", "spunk", "clit", "smegma", "buttfuck", "rimjob", "blowjob", "handjob", "fucktard", "dipshit",
   "pissflaps", "shitstain", "fuckwit", "arsehole", "bellend", "knob", "prat", "git", "minger", "slapper",
-  "cholo", "oreo", "uncle tom", "house nigger", "porch monkey", "jungle bunny", "tar baby", "pickaninny", "coonass", "nigglet",
+  "cholo", "uncle tom", "house nigger", "porch monkey", "jungle bunny", "tar baby", "pickaninny", "coonass", "nigglet",
   "fudgepacker", "carpetmuncher", "lezbo", "breeder", "pansy", "poof", "fairy", "butch", "sissy", "nancy",
   "whigger", "wigger", "whitey", "bluegum", "buckwheat", "jigaboo", "zip coon", "moon cricket", "spook", "boogie",
   "fuckoff", "piss off", "shitface", "asshat", "cocktease", "cumslut", "dickhead", "fucker", "shithead", "twatface",
