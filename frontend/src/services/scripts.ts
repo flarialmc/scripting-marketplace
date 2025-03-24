@@ -1,14 +1,17 @@
 import { Script } from '@/types/script';
 import { API_CONFIG } from '@/config/api';
 
+// Update interface to match the back-end's singular keys
 interface ScriptsResponse {
-  modules: Script[];
-  commands: Script[];
+  module: Script[];
+  command: Script[];
 }
 
 export async function listScripts(): Promise<Script[]> {
   try {
-    const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.LIST}`, {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCRIPTS.LIST}`;
+    console.log('Fetching scripts from:', url); // Debug log
+    const response = await fetch(url, {
       cache: 'no-store',
       mode: 'cors',
       headers: {
@@ -21,24 +24,24 @@ export async function listScripts(): Promise<Script[]> {
     }
     
     const data = await response.json() as ScriptsResponse;
-    // Combine modules and commands into a single array
-    return [...(data.modules || []), ...(data.commands || [])];
+    console.log('Fetched scripts data:', data); // Debug log
+    // Combine module and command into a single array, with fallback for missing keys
+    return [...(data.module || []), ...(data.command || [])];
   } catch (error) {
     console.error('Error fetching scripts:', error);
-    return []; // Return empty array instead of throwing to prevent UI errors
+    return []; // Return empty array on error to prevent UI crashes
   }
 }
 
 export async function getScriptDownloadResponse(name: string, scriptType: 'module' | 'command'): Promise<Response> {
   try {
-    const response = await fetch(
-      `${API_CONFIG.BASE_URL}/api/scripts/${scriptType}/${name}/download`,
-      {
-        method: 'GET',
-        cache: 'no-store',
-        mode: 'cors',
-      }
-    );
+    const url = `${API_CONFIG.BASE_URL}/api/scripts/${scriptType}/${name}/download`;
+    console.log('Downloading script from:', url); // Debug log
+    const response = await fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      mode: 'cors',
+    });
     
     if (!response.ok) {
       throw new Error(`Failed to download script: ${response.statusText}`);
@@ -47,6 +50,6 @@ export async function getScriptDownloadResponse(name: string, scriptType: 'modul
     return response;
   } catch (error) {
     console.error('Error downloading script:', error);
-    throw error; // Rethrow as this is likely used directly by download functions
+    throw error; // Rethrow for caller to handle (e.g., in ScriptCard)
   }
 }
