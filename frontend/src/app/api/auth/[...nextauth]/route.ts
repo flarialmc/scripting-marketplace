@@ -1,4 +1,3 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
@@ -14,8 +13,8 @@ declare module "next-auth" {
   }
 }
 
-// Define authOptions without exporting it
-const authOptions: NextAuthOptions = {
+// Define and export authOptions
+export const authOptions: NextAuthOptions = {
   providers: [
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
@@ -44,6 +43,6 @@ const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-// Export only the HTTP handlers
-export const GET = NextAuth(authOptions);
-export const POST = NextAuth(authOptions);
+// Export the HTTP handlers
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust path if needed
 
 // Store to track user uploads and configs
 const userUploadTracker = new Map<string, number>(); // Key: identifier, Value: timestamp (ms)
@@ -30,6 +32,7 @@ const BAD_WORDS = [
   "raand", "randi", "chuda", "madarchod", "anshul", "chutiya", "ammi", "bari", "ashank", "mbg", "test"
 ].map(word => word.toLowerCase());
 
+
 // Discord Embed interface
 interface DiscordEmbed {
   title: string;
@@ -44,16 +47,11 @@ interface GitHubPR {
 }
 
 // Helper to get unique user identifier
-function getUserIdentifier(request: NextRequest): string {
+function getUserIdentifier(request: NextRequest, discordId: string): string {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
   const cookies = request.cookies;
   const cookieId = cookies.get('user_id')?.value || `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-  return `${ip}-${cookieId}`;
-}
-
-// Helper to get Discord ID from formData
-function getDiscordId(formData: FormData): string | null {
-  return formData.get('discordId') as string | null;
+  return `${ip}-${discordId}-${cookieId}`; // Include discordId for uniqueness
 }
 
 // Helper to generate ID from name
@@ -123,12 +121,20 @@ async function sendWebhookNotification(ip: string, configName: string, username:
 
 export async function POST(request: NextRequest) {
   try {
-    const userIdentifier = getUserIdentifier(request);
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
-    const formData = await request.formData();
-    const discordId = getDiscordId(formData);
-    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, Discord ID: ${discordId || 'none'}`);
+    // Get session to verify user
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.id) {
+      console.log('Unauthorized upload attempt');
+      return NextResponse.json({ error: 'Unauthorized: Please sign in with Discord' }, { status: 401 });
+    }
 
+    const discordId = session.user.id; // Discord ID from session
+    const username = session.user.name || 'Unknown'; // Username from session
+    const userIdentifier = getUserIdentifier(request, discordId);
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
+    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, Discord ID: ${discordId}`);
+
+    const formData = await request.formData();
     const files = formData.getAll('files') as File[];
     const configData = JSON.parse(formData.get('configData') as string);
     const name = configData.name?.trim();
@@ -145,7 +151,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only one config upload allowed per IP' }, { status: 403 });
     }
 
-    if (discordId && discordConfigTracker.has(discordId)) {
+    if (discordConfigTracker.has(discordId)) {
       console.log(`Blocked upload: Discord user ${discordId} already has config "${discordConfigTracker.get(discordId)}"`);
       return NextResponse.json({ error: 'Only one config upload allowed per Discord user' }, { status: 403 });
     }
@@ -197,12 +203,12 @@ export async function POST(request: NextRequest) {
     });
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
 
-    // Always generate main.json from form data
+    // Always generate main.json from form data, using session username
     const mainJsonContent = JSON.stringify({
       id: generatedId,
       name: configData.name,
       version: configData.version,
-      author: configData.author,
+      author: username, // From session, not client
       createdAt: new Date().toISOString(),
     }, null, 2);
     const updatedFiles = [
@@ -261,15 +267,15 @@ export async function POST(request: NextRequest) {
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
 
     // Send Discord webhook notification (no icon)
-    await sendWebhookNotification(ip, name, configData.author || 'Unknown');
+    await sendWebhookNotification(ip, name, username);
 
     ipConfigTracker.set(ip, folderName);
-    if (discordId) discordConfigTracker.set(discordId, folderName);
+    discordConfigTracker.set(discordId, folderName);
     userUploadTracker.set(userIdentifier, currentTime);
 
     const response = NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });
     if (!request.cookies.get('user_id')) {
-      response.cookies.set('user_id', userIdentifier.split('-')[1], { httpOnly: true, maxAge: 60 * 60 * 24 * 365 });
+      response.cookies.set('user_id', userIdentifier.split('-')[2], { httpOnly: true, maxAge: 60 * 60 * 24 * 365 });
     }
     return response;
   } catch (error) {
