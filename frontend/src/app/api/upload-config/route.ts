@@ -26,7 +26,8 @@ const BAD_WORDS = [
   "fudgepacker", "carpetmuncher", "lezbo", "breeder", "pansy", "poof", "fairy", "butch", "sissy", "nancy",
   "whigger", "wigger", "whitey", "bluegum", "buckwheat", "jigaboo", "zip coon", "moon cricket", "spook", "boogie",
   "fuckoff", "piss off", "shitface", "asshat", "cocktease", "cumslut", "dickhead", "fucker", "shithead", "twatface",
-  "bint", "slag", "tart","weasel", "scumbag"
+  "bint", "slag", "tart","weasel", "scumbag", "bkl", "gaand", "madarchod", "bhokachoda", "chut", "lund", "lele", "bhosdike", "bhosad",
+  "raand", "randi", "chuda", "madarchod", "anshul", "chutiya", "ammi", "bari", "ashank", "mbg" 
 ].map(word => word.toLowerCase());
 
 // Discord Embed interface
