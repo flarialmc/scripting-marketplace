@@ -9,7 +9,7 @@ const processingRequests = new Set<string>();
 // Time limit: 24 hours in milliseconds
 const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
 
-// Bad words list (will add more as needed)
+// Bad words list (expand as needed)
 const BAD_WORDS = [     
   "nigger", "nigga", "fuck", "shit", "bitch", "asshole", "cunt", "faggot", "retard", "whore",
   "dick", "pussy", "bastard", "slut", "damn", "hell", "cock", "tits", "prick", "chink",
@@ -28,6 +28,20 @@ const BAD_WORDS = [
   "fuckoff", "piss off", "shitface", "asshat", "cocktease", "cumslut", "dickhead", "fucker", "shithead", "twatface",
   "bint", "slag", "tart","weasel", "scumbag"
 ].map(word => word.toLowerCase());
+
+// Discord Embed interface
+interface DiscordEmbed {
+  title: string;
+  fields: { name: string; value: string; inline: boolean }[];
+  color: number;
+  timestamp: string;
+  thumbnail?: { url: string };
+}
+
+// GitHub PR interface (simplified)
+interface GitHubPR {
+  title: string;
+}
 
 // Helper to get unique user identifier
 function getUserIdentifier(request: NextRequest): string {
@@ -69,8 +83,8 @@ async function checkExistingPR(name: string, githubToken: string): Promise<boole
     console.error(`Failed to fetch PRs: ${await prsResponse.text()}`);
     return false;
   }
-  const prs = await prsResponse.json();
-  return prs.some((pr: any) => generateIdFromName(pr.title.replace('Add config: ', '')) === normalizedName);
+  const prs: GitHubPR[] = await prsResponse.json();
+  return prs.some(pr => generateIdFromName(pr.title.replace('Add config: ', '')) === normalizedName);
 }
 
 // Helper to send Discord webhook notification
@@ -81,7 +95,7 @@ async function sendWebhookNotification(ip: string, configName: string, username:
     return;
   }
 
-  const embed: any = {
+  const embed: DiscordEmbed = {
     title: 'New Config Uploaded',
     fields: [
       { name: 'Config Name', value: configName, inline: true },
