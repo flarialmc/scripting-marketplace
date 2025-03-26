@@ -1,0 +1,134 @@
+[
+    {
+        "name": "noshadows",
+        "value": true
+    },
+    {
+        "name": "fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "promotions",
+        "value": false
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "blurintensity",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": true
+    },
+    {
+        "name": "donotwait",
+        "value": true
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "vsync",
+        "value": true
+    },
+    {
+        "name": "bufferingmode",
+        "value": ""
+    },
+    {
+        "name": "swapeffect",
+        "value": ""
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "anonymousApi",
+        "value": true
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": false
+    },
+    {
+        "name": "gui_font_scale",
+        "value": 0.9700008034706116
+    },
+    {
+        "name": "centreCursor",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "ejectKeybind",
+        "value": ""
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 1.0000066757202148
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "apiusage",
+        "value": true
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "modules_font_scale",
+        "value": 0.7999986410140991
+    },
+    {
+        "name": "overrideFontWeight",
+        "value": false
+    },
+    {
+        "name": "nologoicon",
+        "value": false
+    },
+    {
+        "name": "fontWeight",
+        "value": ""
+    },
+    {
+        "name": "nochaticon",
+        "value": false
+    },
+    {
+        "name": "currentConfig",
+        "value": ""
+    },
+    {
+        "name": "recreateAtStart",
+        "value": true
+    },
+    {
+        "name": "snappinglines",
+        "value": true
+    }
+]
