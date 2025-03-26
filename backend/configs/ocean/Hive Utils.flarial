@@ -1,0 +1,262 @@
+[
+    {
+        "name": "command",
+        "value": ""
+    },
+    {
+        "name": "seeker",
+        "value": false
+    },
+    {
+        "name": "solo",
+        "value": false
+    },
+    {
+        "name": "ReQ",
+        "value": true
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "eliminated",
+        "value": true
+    },
+    {
+        "name": "noteaming",
+        "value": false
+    },
+    {
+        "name": "murderer",
+        "value": false
+    },
+    {
+        "name": "hider",
+        "value": false
+    },
+    {
+        "name": "sheriff",
+        "value": false
+    },
+    {
+        "name": "textscale",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "hub",
+        "value": false
+    },
+    {
+        "name": "innocent",
+        "value": false
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "favorite",
+        "value": false
+    },
+    {
+        "name": "death",
+        "value": false
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "runner",
+        "value": false
+    },
+    {
+        "name": "AutoMapAvoider",
+        "value": false
+    },
+    {
+        "name": "text",
+        "value": "Input maps, like this"
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "replace",
+        "value": true
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "copyCS",
+        "value": false
+    },
+    {
+        "name": "includecommand",
+        "value": false
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "promomessage",
+        "value": false
+    },
+    {
+        "name": "playermessage",
+        "value": false
+    },
+    {
+        "name": "percentageX",
+        "value": 0.0
+    },
+    {
+        "name": "unlocks",
+        "value": false
+    },
+    {
+        "name": "joined",
+        "value": false
+    },
+    {
+        "name": "playermessageplus",
+        "value": false
+    },
+    {
+        "name": "friendaccept",
+        "value": false
+    },
+    {
+        "name": "partyaccept",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "percentageY",
+        "value": 0.0
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6499999761581421
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "map",
+        "value": ""
+    }
+]
