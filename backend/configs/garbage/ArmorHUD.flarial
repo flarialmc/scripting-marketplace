@@ -1,0 +1,210 @@
+[
+    {
+        "name": "uiscale",
+        "value": 1.733999252319336
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "show_offhand",
+        "value": false
+    },
+    {
+        "name": "vertical",
+        "value": true
+    },
+    {
+        "name": "percentageX",
+        "value": 5.413274095644738e-08
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 0.9643015265464783
+    },
+    {
+        "name": "percent",
+        "value": false
+    },
+    {
+        "name": "colorLow",
+        "value": "FF0000"
+    },
+    {
+        "name": "durability_left",
+        "value": false
+    },
+    {
+        "name": "color",
+        "value": false
+    },
+    {
+        "name": "showdurability",
+        "value": false
+    },
+    {
+        "name": "colorMain",
+        "value": "FFFFFF"
+    },
+    {
+        "name": "colorMain_rgb",
+        "value": false
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "colorFull",
+        "value": "40FF00"
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "colorFull_rgb",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "colorLow_rgb",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "textSize",
+        "value": 0.119999960064888
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "favorite",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "textscale",
+        "value": 1.0
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.003000000026077032
+    }
+]
