@@ -1,0 +1,162 @@
+[
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "text",
+        "value": "Reach: {value}"
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textShadowCol",
+        "value": "000000"
+    },
+    {
+        "name": "textscale",
+        "value": 0.6999996304512024
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "percentageX",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 0.024174168705940247
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0000008344650269
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "pady",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.0030000023543834686
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0000007152557373
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0000007152557373
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "favorite",
+        "value": false
+    },
+    {
+        "name": "rounding",
+        "value": 32.00001525878906
+    },
+    {
+        "name": "textColor",
+        "value": "000000"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.5499998927116394
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.0030000023543834686
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.0
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6500002145767212
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    }
+]

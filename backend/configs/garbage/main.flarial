@@ -1,0 +1,146 @@
+[
+    {
+        "name": "noshadows",
+        "value": false
+    },
+    {
+        "name": "fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Space Grotesk"
+    },
+    {
+        "name": "blurintensity",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "donotwait",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": false
+    },
+    {
+        "name": "limitblurfps",
+        "value": false
+    },
+    {
+        "name": "dynamicblurrquality",
+        "value": false
+    },
+    {
+        "name": "highqualityblur",
+        "value": false
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "vsync",
+        "value": true
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "anonymousApi",
+        "value": true
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": false
+    },
+    {
+        "name": "gui_font_scale",
+        "value": 0.9999984502792358
+    },
+    {
+        "name": "centreCursor",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "ejectKeybind",
+        "value": ""
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 1.000004768371582
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "apiusage",
+        "value": true
+    },
+    {
+        "name": "promotions",
+        "value": false
+    },
+    {
+        "name": "bufferingmode",
+        "value": ""
+    },
+    {
+        "name": "swapeffect",
+        "value": ""
+    },
+    {
+        "name": "modules_font_scale",
+        "value": 0.9999984502792358
+    },
+    {
+        "name": "overrideFontWeight",
+        "value": false
+    },
+    {
+        "name": "nologoicon",
+        "value": false
+    },
+    {
+        "name": "fontWeight",
+        "value": ""
+    },
+    {
+        "name": "nochaticon",
+        "value": true
+    },
+    {
+        "name": "currentConfig",
+        "value": ""
+    },
+    {
+        "name": "recreateAtStart",
+        "value": true
+    },
+    {
+        "name": "snappinglines",
+        "value": true
+    }
+]
