@@ -1,0 +1,118 @@
+[
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "text",
+        "value": "{value} ms"
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 0.08083333075046539
+    },
+    {
+        "name": "textscale",
+        "value": 0.8000003695487976
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "percentageX",
+        "value": 0.9015191197395325
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0000004768371582
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0000004768371582
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "rounding",
+        "value": 32.000003814697266
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6500002145767212
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    }
+]

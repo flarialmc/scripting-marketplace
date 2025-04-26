@@ -1,0 +1,162 @@
+[
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "uiscale",
+        "value": 0.9999994039535522
+    },
+    {
+        "name": "vertical",
+        "value": true
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "show_offhand",
+        "value": true
+    },
+    {
+        "name": "percentageX",
+        "value": 0.010249633342027664
+    },
+    {
+        "name": "percentageY",
+        "value": 0.4142441749572754
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "durability_left",
+        "value": false
+    },
+    {
+        "name": "percent",
+        "value": false
+    },
+    {
+        "name": "colorLow",
+        "value": "FF0000"
+    },
+    {
+        "name": "color",
+        "value": false
+    },
+    {
+        "name": "showdurability",
+        "value": false
+    },
+    {
+        "name": "colorMain",
+        "value": "FFFFFF"
+    },
+    {
+        "name": "colorMain_rgb",
+        "value": false
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "colorFull",
+        "value": "40FF00"
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "colorFull_rgb",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "colorLow_rgb",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "textSize",
+        "value": 0.12000005692243576
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    }
+]
