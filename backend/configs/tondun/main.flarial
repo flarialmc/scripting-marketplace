@@ -1,0 +1,90 @@
+[
+    {
+        "name": "noshadows",
+        "value": false
+    },
+    {
+        "name": "fontname",
+        "value": "Minecraft"
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Minecraft"
+    },
+    {
+        "name": "anonymousApi",
+        "value": false
+    },
+    {
+        "name": "blurintensity",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "vsync",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": true
+    },
+    {
+        "name": "limitblurfps",
+        "value": true
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": true
+    },
+    {
+        "name": "centreCursor",
+        "value": false
+    },
+    {
+        "name": "ejectKeybind",
+        "value": ""
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 0.999998152256012
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "dynamicblurrquality",
+        "value": true
+    },
+    {
+        "name": "highqualityblur",
+        "value": false
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    }
+]
