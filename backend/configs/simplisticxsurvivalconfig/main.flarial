@@ -1,0 +1,150 @@
+[
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "noshadows",
+        "value": true
+    },
+    {
+        "name": "fontname",
+        "value": "Minecraft"
+    },
+    {
+        "name": "anonymousApi",
+        "value": false
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Minecraft"
+    },
+    {
+        "name": "blurintensity",
+        "value": 3.830998420715332
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "vsync",
+        "value": true
+    },
+    {
+        "name": "limitblurfps",
+        "value": true
+    },
+    {
+        "name": "dlassets",
+        "value": false
+    },
+    {
+        "name": "donotwait",
+        "value": true
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": false
+    },
+    {
+        "name": "gui_font_scale",
+        "value": 1.0
+    },
+    {
+        "name": "centreCursor",
+        "value": true
+    },
+    {
+        "name": "ejectKeybind",
+        "value": ""
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 10.0
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "apiusage",
+        "value": true
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    },
+    {
+        "name": "dynamicblurrquality",
+        "value": true
+    },
+    {
+        "name": "highqualityblur",
+        "value": false
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "promotions",
+        "value": false
+    },
+    {
+        "name": "bufferingmode",
+        "value": ""
+    },
+    {
+        "name": "swapeffect",
+        "value": ""
+    },
+    {
+        "name": "modules_font_scale",
+        "value": 1.0
+    },
+    {
+        "name": "overrideFontWeight",
+        "value": false
+    },
+    {
+        "name": "nologoicon",
+        "value": true
+    },
+    {
+        "name": "fontWeight",
+        "value": ""
+    },
+    {
+        "name": "nochaticon",
+        "value": true
+    },
+    {
+        "name": "currentConfig",
+        "value": ""
+    },
+    {
+        "name": "recreateAtStart",
+        "value": false
+    },
+    {
+        "name": "forceIntel",
+        "value": true
+    },
+    {
+        "name": "snappinglines",
+        "value": true
+    }
+]
