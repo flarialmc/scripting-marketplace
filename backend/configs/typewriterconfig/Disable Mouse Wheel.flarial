@@ -1,0 +1,14 @@
+[
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "favorite",
+        "value": false
+    }
+]

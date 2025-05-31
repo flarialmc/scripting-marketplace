@@ -1,0 +1,326 @@
+[
+    {
+        "name": "glowColor",
+        "value": "F0F0F0"
+    },
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "favorite",
+        "value": true
+    },
+    {
+        "name": "percentageX",
+        "value": 1.044116497039795
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "enabledRGBSpeed",
+        "value": 1.0
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textscale",
+        "value": 1.0000005960464478
+    },
+    {
+        "name": "glow",
+        "value": false
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 1.0
+    },
+    {
+        "name": "spacebarHeight",
+        "value": 0.08999995142221451
+    },
+    {
+        "name": "borderWidth",
+        "value": 0.999999463558197
+    },
+    {
+        "name": "textscale2",
+        "value": 0.999999463558197
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "rmbtext",
+        "value": "{value} CPS"
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "sText",
+        "value": "S"
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.0029999995604157448
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "lmbrmb",
+        "value": true
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "rounding",
+        "value": 100.0
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "textColor",
+        "value": "ffffff"
+    },
+    {
+        "name": "spacebarWidth",
+        "value": 0.5000002980232239
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "cps",
+        "value": false
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "enabledRGB",
+        "value": false
+    },
+    {
+        "name": "enabledColor",
+        "value": "554a4a"
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "enabledOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "showBg",
+        "value": true
+    },
+    {
+        "name": "dText",
+        "value": "D"
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.0029999995604157448
+    },
+    {
+        "name": "glowRGB",
+        "value": false
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "lmbtext",
+        "value": "{value} CPS"
+    },
+    {
+        "name": "hidecps",
+        "value": true
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "uiscale",
+        "value": 0.8414870500564575
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "textEnabledColor",
+        "value": "000000"
+    },
+    {
+        "name": "textEnabledRGB",
+        "value": false
+    },
+    {
+        "name": "textEnabledRGBSpeed",
+        "value": 1.0
+    },
+    {
+        "name": "textEnabledOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "wText",
+        "value": "W"
+    },
+    {
+        "name": "aText",
+        "value": "A"
+    },
+    {
+        "name": "keySpacing",
+        "value": 1.6300008296966553
+    },
+    {
+        "name": "glowAmount",
+        "value": 29.999982833862305
+    },
+    {
+        "name": "glowOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "glowEnabledColor",
+        "value": "F0F0F0"
+    },
+    {
+        "name": "glowEnabledOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "glowEnabledRGB",
+        "value": false
+    },
+    {
+        "name": "EtextShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "EtextShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "EtextShadowRGB",
+        "value": false
+    },
+    {
+        "name": "DtextShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "DtextShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "DtextShadowRGB",
+        "value": false
+    },
+    {
+        "name": "mainlmbtext",
+        "value": "LMB"
+    },
+    {
+        "name": "mainrmbtext",
+        "value": "RMB"
+    },
+    {
+        "name": "edSpeed",
+        "value": 0.9999995231628418
+    },
+    {
+        "name": "glowEnabledAmount",
+        "value": 48.201416015625
+    },
+    {
+        "name": "glowSpeed",
+        "value": 0.9999995231628418
+    },
+    {
+        "name": "glowEnabled",
+        "value": false
+    }
+]

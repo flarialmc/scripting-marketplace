@@ -1,0 +1,42 @@
+[
+    {
+        "name": "lewisbounce",
+        "value": false
+    },
+    {
+        "name": "keybind",
+        "value": ""
+    },
+    {
+        "name": "enabled",
+        "value": false
+    },
+    {
+        "name": "lewisbouncespeed",
+        "value": 1.0
+    },
+    {
+        "name": "favorite",
+        "value": false
+    },
+    {
+        "name": "lewiscrosshair",
+        "value": false
+    },
+    {
+        "name": "lewisbouncesize",
+        "value": 1.0
+    },
+    {
+        "name": "lewiscrosshairsize",
+        "value": 1.0
+    },
+    {
+        "name": "lewislogo",
+        "value": false
+    },
+    {
+        "name": "lewisscream",
+        "value": false
+    }
+]
