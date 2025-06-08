@@ -1,0 +1,90 @@
+[
+    {
+        "name": "noshadows",
+        "value": false
+    },
+    {
+        "name": "fontname",
+        "value": "Coolvetica"
+    },
+    {
+        "name": "mod_fontname",
+        "value": "Coolvetica"
+    },
+    {
+        "name": "blurintensity",
+        "value": 0.0010000000474974513
+    },
+    {
+        "name": "disable_alias",
+        "value": false
+    },
+    {
+        "name": "dlassets",
+        "value": true
+    },
+    {
+        "name": "limitblurfps",
+        "value": false
+    },
+    {
+        "name": "dynamicblurrquality",
+        "value": false
+    },
+    {
+        "name": "highqualityblur",
+        "value": false
+    },
+    {
+        "name": "killdx",
+        "value": true
+    },
+    {
+        "name": "vsync",
+        "value": false
+    },
+    {
+        "name": "disableanims",
+        "value": false
+    },
+    {
+        "name": "anonymousApi",
+        "value": false
+    },
+    {
+        "name": "noicons",
+        "value": false
+    },
+    {
+        "name": "watermark",
+        "value": false
+    },
+    {
+        "name": "centreCursor",
+        "value": false
+    },
+    {
+        "name": "aliasingMode",
+        "value": "Default"
+    },
+    {
+        "name": "ejectKeybind",
+        "value": "F12"
+    },
+    {
+        "name": "enabledModulesOnTop",
+        "value": false
+    },
+    {
+        "name": "rgb_speed",
+        "value": 0.9999991655349731
+    },
+    {
+        "name": "rgb_saturation",
+        "value": 1.0
+    },
+    {
+        "name": "rgb_value",
+        "value": 1.0
+    }
+]
