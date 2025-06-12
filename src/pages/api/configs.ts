@@ -19,16 +19,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('🚀 API /configs endpoint called');
     const ctx = createTRPCContext();
     const caller = appRouter.createCaller(ctx);
-    console.log('📞 Calling tRPC configs.getAll...');
     const configs = await caller.configs.getAll();
-    console.log('📦 API received configs:', configs);
     
     res.status(200).json(configs);
   } catch (error) {
-    console.error('❌ Error in API /configs endpoint:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -58,7 +58,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(404).json({ error: 'Not found' });
     }
   } catch (error) {
-    console.error('Error handling config request:', error);
     if (error instanceof Error && (error.message === 'Config not found' || error.message === 'Icon not found')) {
       res.status(404).json({ error: error.message });
     } else {

@@ -94,12 +94,18 @@ class ConfigService {
     const iconUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configId}/icon.png`;
     
     try {
-      const response = await fetch(iconUrl);
+      const response = await fetch(iconUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
       if (!response.ok) {
-        throw new Error('Icon not found');
+        throw new Error(`Icon not found: ${response.status} ${response.statusText}`);
       }
       
       const buffer = await response.arrayBuffer();
+      
       return {
         data: Buffer.from(buffer).toString('base64'),
         contentType: 'image/png',
@@ -125,7 +131,6 @@ class ConfigService {
         contentType: 'application/zip',
       };
     } catch (error) {
-      console.error(`Error fetching config archive for ${configId}:`, error);
       throw new Error('Config archive not found');
     }
   }
@@ -135,9 +140,7 @@ const configService = new ConfigService();
 
 export const configsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    console.log('🔄 tRPC getAll called');
     const configs = await configService.getConfigs();
-    console.log('📦 tRPC returning configs:', configs.length);
     return { configs };
   }),
 

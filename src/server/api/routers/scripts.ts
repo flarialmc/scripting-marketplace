@@ -32,7 +32,6 @@ class ScriptService {
 
   private async fetchScriptIndex(scriptType: 'module' | 'command'): Promise<ScriptIndexEntry[]> {
     const indexUrl = `https://cdn.statically.io/gh/flarialmc/scripts/main/${scriptType}-index.json`;
-    console.log(`🔗 Fetching ${scriptType} index:`, indexUrl);
     
     const response = await fetch(indexUrl);
     if (!response.ok) {
@@ -40,13 +39,11 @@ class ScriptService {
     }
     
     const data = await response.json();
-    console.log(`📚 Loaded ${data.length} ${scriptType} scripts from index`);
     return data;
   }
 
   private async fetchScriptContent(scriptType: 'module' | 'command', filename: string): Promise<string> {
     const scriptUrl = `https://cdn.statically.io/gh/flarialmc/scripts/main/${scriptType}/${filename}`;
-    console.log('🔗 Fetching script:', scriptUrl);
     
     const response = await fetch(scriptUrl);
     if (!response.ok) {
@@ -73,31 +70,25 @@ class ScriptService {
 
   private async loadScriptsFromIndex(scriptType: 'module' | 'command'): Promise<ScriptMetadata[]> {
     try {
-      console.log(`🔍 Loading ${scriptType} scripts from index...`);
       const indexEntries = await this.fetchScriptIndex(scriptType);
       
       const scripts: ScriptMetadata[] = indexEntries.map(entry => 
         this.convertIndexEntryToMetadata(entry)
       );
 
-      console.log(`✅ Successfully loaded ${scripts.length} ${scriptType} scripts`);
       return scripts;
     } catch (error) {
-      console.error(`❌ Error loading ${scriptType} scripts from index:`, error);
       return [];
     }
   }
 
   async getScripts() {
-    console.log('🔄 getScripts() called');
     const now = Date.now();
     
     if (this.cache && now < this.cacheExpiry) {
-      console.log('💾 Returning cached scripts');
       return this.cache;
     }
 
-    console.log('🆕 Cache expired or empty, loading fresh scripts...');
     try {
       const [moduleScripts, commandScripts] = await Promise.all([
         this.loadScriptsFromIndex('module'),
@@ -110,19 +101,15 @@ class ScriptService {
       };
       this.cacheExpiry = now + this.CACHE_DURATION;
 
-      console.log(`💾 Cached ${moduleScripts.length} modules and ${commandScripts.length} commands`);
       return this.cache;
     } catch (error) {
-      console.error('❌ Error fetching scripts:', error);
       const fallback = this.cache || { module: [], command: [] };
-      console.log('🔄 Returning fallback scripts');
       return fallback;
     }
   }
 
   async getScript(scriptType: 'module' | 'command', scriptName: string): Promise<string> {
     try {
-      console.log(`🔍 Fetching ${scriptType} script: ${scriptName}`);
       const indexEntries = await this.fetchScriptIndex(scriptType);
       const entry = indexEntries.find(e => 
         e.filename.replace('.lua', '').toLowerCase() === scriptName.toLowerCase()
@@ -134,7 +121,6 @@ class ScriptService {
 
       return await this.fetchScriptContent(scriptType, entry.filename);
     } catch (error) {
-      console.error(`❌ Error fetching script ${scriptName}:`, error);
       throw new Error('Failed to fetch script');
     }
   }
@@ -144,9 +130,7 @@ const scriptService = new ScriptService();
 
 export const scriptsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    console.log('🔄 tRPC scripts.getAll called');
     const scripts = await scriptService.getScripts();
-    console.log(`📦 tRPC returning ${scripts.module.length} modules and ${scripts.command.length} commands`);
     return scripts;
   }),
 

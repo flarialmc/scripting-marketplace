@@ -56,7 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).send(content);
     }
   } catch (error) {
-    console.error('Error handling script request:', error);
     if (error instanceof Error && error.message === 'Script not found') {
       res.status(404).json({ error: 'Script not found' });
     } else {

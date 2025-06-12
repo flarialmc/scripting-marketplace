@@ -22,7 +22,6 @@ export async function listConfigs(): Promise<Config[]> {
     const data = await response.json() as ConfigsResponse;
     return data.configs || [];
   } catch (error) {
-    console.error('Error fetching configs:', error);
     return [];
   }
 }
@@ -44,7 +43,6 @@ export async function getConfigDownloadResponse(configId: string): Promise<Respo
 
     return response;
   } catch (error) {
-    console.error('Error downloading config:', error);
     throw error;
   }
 }

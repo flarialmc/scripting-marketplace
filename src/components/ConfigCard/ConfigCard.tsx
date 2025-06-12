@@ -62,7 +62,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
           onClick={() => setShowFullImage(true)}
         >
           <Image
-            src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
+            src={`https://cdn.statically.io/gh/flarialmc/configs/main/${config.id}/icon.png`}
             width={1280}
             height={720}
             alt="Config Image"
