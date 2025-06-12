@@ -35,7 +35,6 @@ export async function listScripts(): Promise<Script[]> {
 
 export async function getScriptDownloadResponse(script: Script): Promise<Response> {
   try {
-    // Use the server-side proxy endpoint to avoid CORS issues
     const url = `${API_CONFIG.BASE_URL}/api/scripts/${script.type}/${script.filename}/download`;
     
     console.log('Downloading script via server proxy:', url);

@@ -33,7 +33,6 @@ class ConfigService {
 
   private async fetchConfigIndex(): Promise<ConfigIndexEntry[]> {
     const indexUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/config-index.json`;
-    console.log(`🔗 Fetching config index:`, indexUrl);
     
     const response = await fetch(indexUrl);
     if (!response.ok) {
@@ -41,7 +40,6 @@ class ConfigService {
     }
     
     const data = await response.json();
-    console.log(`📚 Loaded ${data.length} configs from index`);
     return data;
   }
 
@@ -62,41 +60,32 @@ class ConfigService {
 
   private async loadConfigsFromIndex(): Promise<ConfigMetadata[]> {
     try {
-      console.log('🔍 Loading configs from index...');
       const indexEntries = await this.fetchConfigIndex();
       
       const configs: ConfigMetadata[] = indexEntries.map(entry => 
         this.convertIndexEntryToMetadata(entry)
       );
 
-      console.log(`✅ Successfully loaded ${configs.length} configs`);
       return configs;
     } catch (error) {
-      console.error(`❌ Error loading configs from index:`, error);
       return [];
     }
   }
 
   async getConfigs(): Promise<ConfigMetadata[]> {
-    console.log('🔄 getConfigs() called');
     const now = Date.now();
     
     if (this.cache && now < this.cacheExpiry) {
-      console.log('💾 Returning cached configs:', this.cache.length);
       return this.cache;
     }
 
-    console.log('🆕 Cache expired or empty, loading fresh configs...');
     try {
       const configs = await this.loadConfigsFromIndex();
-      console.log('💾 Caching configs:', configs.length);
       this.cache = configs;
       this.cacheExpiry = now + this.CACHE_DURATION;
       return configs;
     } catch (error) {
-      console.error('❌ Error fetching configs:', error);
       const fallback = this.cache || [];
-      console.log('🔄 Returning fallback configs:', fallback.length);
       return fallback;
     }
   }
@@ -116,7 +105,6 @@ class ConfigService {
         contentType: 'image/png',
       };
     } catch (error) {
-      console.error(`Error fetching icon for ${configId}:`, error);
       throw new Error('Icon not found');
     }
   }
