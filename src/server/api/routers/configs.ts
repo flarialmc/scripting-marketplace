@@ -1,112 +1,173 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
-import { promises as fs } from 'fs';
-import path from 'path';
-import archiver from 'archiver';
 
 interface ConfigMetadata {
   id: string;
   name: string;
-  description?: string;
-  author?: string;
-  [key: string]: unknown;
+  description: string;
+  author: string;
+  version: string;
+  downloadUrl: string;
+  iconUrl: string;
+  filename: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 class ConfigService {
-  private baseDir: string;
+  private cache: ConfigMetadata[] | null = null;
+  private cacheExpiry: number = 0;
+  private readonly CACHE_DURATION = 5 * 60 * 1000;
 
-  constructor() {
-    this.baseDir = path.resolve(process.cwd(), 'configs');
+  // Hardcoded list of config directories from the repository
+  private readonly CONFIG_DIRECTORIES = [
+    'Astral UI',
+    'BetterFlarial',
+    'Default',
+    'Fluro',
+    'Lunar Client',
+    'Material',
+    'Monsoon',
+    'NG Flex',
+    'Phantom Force',
+    'Photon',
+    'Solstice',
+    'Stratus',
+    'Vortex'
+  ];
+
+  private async fetchFileContent(url: string): Promise<string> {
+    console.log('🔗 Fetching:', url);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch file: ${response.statusText}`);
+    }
+    return response.text();
+  }
+
+  private parseConfigMetadata(content: string, configName: string): ConfigMetadata {
+    const metadata = {
+      id: configName,
+      name: configName,
+      description: '',
+      author: '',
+      version: '1.0.0',
+      downloadUrl: `https://cdn.statically.io/gh/flarialmc/configs/main/${configName}/${configName}.zip`,
+      iconUrl: `https://cdn.statically.io/gh/flarialmc/configs/main/${configName}/icon.png`,
+      filename: configName,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      const configData = JSON.parse(content);
+      if (configData.name) metadata.name = configData.name;
+      if (configData.description) metadata.description = configData.description;
+      if (configData.author) metadata.author = configData.author;
+      if (configData.version) metadata.version = configData.version;
+    } catch (error) {
+      console.log(`⚠️ Error parsing config metadata for ${configName}:`, error);
+    }
+
+    return metadata;
+  }
+
+  private async loadConfigsFromStatically(): Promise<ConfigMetadata[]> {
+    console.log('🔍 Loading configs from Statically.io...');
+    const configs: ConfigMetadata[] = [];
+
+    for (const configName of this.CONFIG_DIRECTORIES) {
+      try {
+        console.log(`📂 Processing config: ${configName}`);
+        const mainJsonUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configName}/main.json`;
+        
+        try {
+          const content = await this.fetchFileContent(mainJsonUrl);
+          const metadata = this.parseConfigMetadata(content, configName);
+          configs.push(metadata);
+          console.log(`✅ Added config with metadata: ${configName}`);
+        } catch (error) {
+          console.log(`⚠️ No main.json found for ${configName}, using default metadata`);
+          const metadata = this.parseConfigMetadata('{}', configName);
+          configs.push(metadata);
+          console.log(`✅ Added default config: ${configName}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error processing config ${configName}:`, error);
+        // Still add the config with default metadata
+        const metadata = this.parseConfigMetadata('{}', configName);
+        configs.push(metadata);
+        console.log(`✅ Added fallback config: ${configName}`);
+      }
+    }
+
+    console.log(`🎉 Successfully loaded ${configs.length} configs`);
+    return configs;
   }
 
   async getConfigs(): Promise<ConfigMetadata[]> {
+    console.log('🔄 getConfigs() called');
+    const now = Date.now();
+    
+    if (this.cache && now < this.cacheExpiry) {
+      console.log('💾 Returning cached configs:', this.cache.length);
+      return this.cache;
+    }
+
+    console.log('🆕 Cache expired or empty, loading fresh configs...');
     try {
-      const entries = await fs.readdir(this.baseDir, { withFileTypes: true });
-      const configs: ConfigMetadata[] = [];
-
-      for (const entry of entries) {
-        if (!entry.isDirectory()) {
-          continue;
-        }
-
-        const metadataPath = path.join(this.baseDir, entry.name, 'main.json');
-        
-        try {
-          const metadataContent = await fs.readFile(metadataPath, 'utf-8');
-          const configInfo = JSON.parse(metadataContent) as ConfigMetadata;
-          
-         
-          if (!configInfo.name) {
-            configInfo.name = entry.name;
-          }
-          configInfo.id = entry.name;
-          
-          configs.push(configInfo);
-        } catch (err) {
-          console.error(`Error reading metadata for ${entry.name}:`, err);
-        }
-      }
-
+      const configs = await this.loadConfigsFromStatically();
+      console.log('💾 Caching configs:', configs.length);
+      this.cache = configs;
+      this.cacheExpiry = now + this.CACHE_DURATION;
       return configs;
-    } catch (err) {
-      console.error('Error reading configs directory:', err);
-      return [];
+    } catch (error) {
+      console.error('❌ Error fetching configs:', error);
+      const fallback = this.cache || [];
+      console.log('🔄 Returning fallback configs:', fallback.length);
+      return fallback;
     }
   }
 
-  private async findConfigDirCaseInsensitive(configID: string): Promise<string> {
-    const entries = await fs.readdir(this.baseDir, { withFileTypes: true });
-    const lowerConfigID = configID.toLowerCase();
-    
-    for (const entry of entries) {
-      if (entry.isDirectory() && entry.name.toLowerCase() === lowerConfigID) {
-        return entry.name;
-      }
-    }
-    
-    throw new Error('Config not found');
-  }
-
-  async getConfigIcon(configID: string): Promise<Buffer> {
-    const actualConfigName = await this.findConfigDirCaseInsensitive(configID);
-    const iconPath = path.join(this.baseDir, actualConfigName, 'icon.png');
+  async getConfigIcon(configId: string): Promise<{ data: string; contentType: string }> {
+    const iconUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configId}/icon.png`;
     
     try {
-      return await fs.readFile(iconPath);
-    } catch {
+      const response = await fetch(iconUrl);
+      if (!response.ok) {
+        throw new Error('Icon not found');
+      }
+      
+      const buffer = await response.arrayBuffer();
+      return {
+        data: Buffer.from(buffer).toString('base64'),
+        contentType: 'image/png',
+      };
+    } catch (error) {
+      console.error(`Error fetching icon for ${configId}:`, error);
       throw new Error('Icon not found');
     }
   }
 
-  async getConfigArchive(configID: string): Promise<{ buffer: Buffer; filename: string }> {
-    const actualConfigName = await this.findConfigDirCaseInsensitive(configID);
-    const configDir = path.join(this.baseDir, actualConfigName);
+  async getConfigArchive(configId: string): Promise<{ data: string; filename: string; contentType: string }> {
+    const zipUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configId}/${configId}.zip`;
     
-   
     try {
-      const stat = await fs.stat(configDir);
-      if (!stat.isDirectory()) {
-        throw new Error('Config not found');
+      const response = await fetch(zipUrl);
+      if (!response.ok) {
+        throw new Error('Config archive not found');
       }
-    } catch {
-      throw new Error('Config not found');
-    }
-
-    return new Promise((resolve, reject) => {
-      const chunks: Buffer[] = [];
-      const archive = archiver('zip', { zlib: { level: 9 } });
       
-      archive.on('data', (chunk) => chunks.push(chunk));
-      archive.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        resolve({ buffer, filename: `${actualConfigName}.zip` });
-      });
-      archive.on('error', reject);
-
-     
-      archive.directory(configDir, false);
-      archive.finalize();
-    });
+      const buffer = await response.arrayBuffer();
+      return {
+        data: Buffer.from(buffer).toString('base64'),
+        filename: `${configId}.zip`,
+        contentType: 'application/zip',
+      };
+    } catch (error) {
+      console.error(`Error fetching config archive for ${configId}:`, error);
+      throw new Error('Config archive not found');
+    }
   }
 }
 
@@ -114,7 +175,9 @@ const configService = new ConfigService();
 
 export const configsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
+    console.log('🔄 tRPC getAll called');
     const configs = await configService.getConfigs();
+    console.log('📦 tRPC returning configs:', configs.length);
     return { configs };
   }),
 
@@ -123,12 +186,7 @@ export const configsRouter = createTRPCRouter({
       configId: z.string(),
     }))
     .query(async ({ input }) => {
-      const iconBuffer = await configService.getConfigIcon(input.configId);
-     
-      return {
-        data: iconBuffer.toString('base64'),
-        contentType: 'image/png',
-      };
+      return await configService.getConfigIcon(input.configId);
     }),
 
   downloadConfig: publicProcedure
@@ -136,11 +194,6 @@ export const configsRouter = createTRPCRouter({
       configId: z.string(),
     }))
     .query(async ({ input }) => {
-      const result = await configService.getConfigArchive(input.configId);
-      return {
-        data: result.buffer.toString('base64'),
-        filename: result.filename,
-        contentType: 'application/zip',
-      };
+      return await configService.getConfigArchive(input.configId);
     }),
 });
