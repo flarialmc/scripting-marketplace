@@ -25,13 +25,13 @@ export default function Home() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Scripts");
-  const [isLoading, setIsLoading] = useState(true); // Still used for data fetching
-  const [showIntroAnimation, setShowIntroAnimation] = useState(true); // New state for animation
+  const [isLoading, setIsLoading] = useState(true);
+  const [showIntroAnimation, setShowIntroAnimation] = useState(true);
   const searchRef = useRef<HTMLDivElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  // Fetch initial data
+ 
   useEffect(() => {
     async function fetchInitialData() {
       try {
@@ -48,7 +48,7 @@ export default function Home() {
     fetchInitialData();
   }, []);
 
-  // Fetch data when selectedOption changes
+ 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -66,12 +66,10 @@ export default function Home() {
         setIsLoading(false);
       }
     }
-    if (!isLoading) {
-      fetchData();
-    }
-  }, [selectedOption, isLoading]);
+    fetchData();
+  }, [selectedOption]);
 
-  // Handle click outside for search and dropdown
+ 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && event.target instanceof Node && !searchRef.current.contains(event.target)) {
@@ -87,12 +85,12 @@ export default function Home() {
     };
   }, []);
 
-  // Control the intro animation (runs for 3 seconds on mount)
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowIntroAnimation(false);
-    }, 3000); // Animation lasts 3 seconds
-    return () => clearTimeout(timer); // Cleanup timer on unmount
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredScripts = scripts.filter(script => 
@@ -117,7 +115,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: 1, delay: 2 }} // Fade out after 2s, over 1s
+          transition={{ duration: 1, delay: 2 }}
           className="absolute inset-0 flex items-center justify-center z-50"
         >
           <div className="absolute inset-0 bg-black/80 before:absolute before:inset-0 before:backdrop-blur-lg"></div>

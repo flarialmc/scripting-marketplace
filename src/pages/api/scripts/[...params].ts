@@ -7,9 +7,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Add CORS headers
+ 
   const origin = req.headers.origin;
-  if (origin === 'https://marketplace.flarial.xyz') {
+  const allowedOrigins = ['https://marketplace.flarial.xyz', 'http://localhost:3000'];
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
@@ -35,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const caller = appRouter.createCaller(ctx);
 
     if (action === 'download') {
-      // Handle download
+     
       const result = await caller.scripts.downloadScript({
         type: scriptType as 'module' | 'command',
         name: scriptName,
@@ -45,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
       res.status(200).send(result.content);
     } else {
-      // Handle get script content
+     
       const content = await caller.scripts.getScript({
         type: scriptType as 'module' | 'command',
         name: scriptName,

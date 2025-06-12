@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 
-// Extend HTMLInputElement to include webkitdirectory
+
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
     webkitdirectory?: string | boolean;
@@ -92,7 +92,7 @@ function ConfigUploadInner() {
         setShowIconPicker(false);
       };
       reader.readAsDataURL(file);
-      setCroppedImage(file); // Store original for cropping
+      setCroppedImage(file);
     } else {
       setError('Please select a valid image file.');
     }
@@ -106,7 +106,7 @@ function ConfigUploadInner() {
     img.onload = () => {
       const canvas = canvasRef.current!;
       const ctx = canvas.getContext('2d')!;
-      canvas.width = 64; // Desired size
+      canvas.width = 64;
       canvas.height = 64;
       const size = Math.min(img.width, img.height);
       const x = (img.width - size) / 2;

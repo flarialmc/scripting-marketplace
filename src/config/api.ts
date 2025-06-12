@@ -1,11 +1,11 @@
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://1klcjc8um5aq.flarial.xyz',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'),
   ENDPOINTS: {
     SCRIPTS: {
       LIST: '/api/scripts',
       DOWNLOAD: (scriptId: string) => `/api/scripts/${scriptId}/download`,
     },
-    CONFIGS: {  // Added Configs patch (im a dumb fuck fr)
+    CONFIGS: { 
       LIST: '/api/configs',
       DOWNLOAD: (configId: string) => `/api/configs/${configId}/download`,
     },

@@ -1,91 +1,64 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
-import { promises as fs } from 'fs';
-import path from 'path';
-
 
 interface ScriptMetadata {
+  id: string;
   name: string;
   description: string;
   author: string;
   type: 'module' | 'command';
+  version: string;
+  downloadUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl: string;
+}
+
+interface GitHubFile {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  url: string;
+  html_url: string;
+  git_url: string;
+  download_url: string;
+  type: string;
 }
 
 class ScriptService {
-  private moduleDir: string;
-  private commandDir: string;
-  private nameToFile: Map<string, Map<string, string>>;
-  private moduleScripts: ScriptMetadata[];
-  private commandScripts: ScriptMetadata[];
+  private cache: { module: ScriptMetadata[]; command: ScriptMetadata[] } | null = null;
+  private cacheExpiry: number = 0;
+  private readonly CACHE_DURATION = 5 * 60 * 1000;
 
-  constructor() {
-    this.moduleDir = path.resolve(process.cwd(), 'scripts/module');
-    this.commandDir = path.resolve(process.cwd(), 'scripts/command');
-    this.nameToFile = new Map();
-    this.moduleScripts = [];
-    this.commandScripts = [];
-    
-    // Initialize the service
-    this.initialize();
-  }
-
-  private async initialize() {
-    try {
-      this.moduleScripts = await this.listScripts(this.moduleDir, 'module');
-      this.commandScripts = await this.listScripts(this.commandDir, 'command');
-    } catch (error) {
-      console.error('Error initializing script service:', error);
+  private async fetchGitHubDirectory(path: string): Promise<GitHubFile[]> {
+    const response = await fetch(`https://api.github.com/repos/flarialmc/scripts/contents/${path}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch GitHub directory: ${response.statusText}`);
     }
+    return response.json();
   }
 
-  private async listScripts(dir: string, scriptType: 'module' | 'command'): Promise<ScriptMetadata[]> {
-    try {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
-      
-      if (!this.nameToFile.has(scriptType)) {
-        this.nameToFile.set(scriptType, new Map());
-      }
-
-      const scripts: ScriptMetadata[] = [];
-      
-      for (const entry of entries) {
-        if (entry.isDirectory() || !entry.name.endsWith('.lua')) {
-          continue;
-        }
-
-        const scriptPath = path.join(dir, entry.name);
-        const fileName = path.parse(entry.name).name;
-        
-        try {
-          const content = await fs.readFile(scriptPath, 'utf-8');
-          const metadata = this.parseScriptMetadata(content, scriptType);
-          
-          if (!metadata.name) {
-            metadata.name = fileName;
-          }
-
-          const normalizedName = metadata.name.toLowerCase();
-          this.nameToFile.get(scriptType)?.set(normalizedName, fileName);
-          
-          scripts.push(metadata);
-        } catch (err) {
-          console.error(`Error processing script ${scriptPath}:`, err);
-        }
-      }
-
-      return scripts;
-    } catch (error) {
-      console.error(`Error reading directory ${dir}:`, error);
-      return [];
+  private async fetchScriptContent(downloadUrl: string): Promise<string> {
+    const response = await fetch(downloadUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch script content: ${response.statusText}`);
     }
+    return response.text();
   }
 
-  private parseScriptMetadata(content: string, scriptType: 'module' | 'command'): ScriptMetadata {
-    const metadata: ScriptMetadata = {
+  private parseScriptMetadata(content: string, scriptType: 'module' | 'command', fileName: string): ScriptMetadata {
+    const metadata = {
+      id: `${scriptType}-${fileName.replace('.lua', '')}`,
       name: '',
       description: '',
       author: '',
       type: scriptType,
+      version: '1.0.0',
+      downloadUrl: `https://raw.githubusercontent.com/flarialmc/scripts/main/${scriptType}/${fileName}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      imageUrl: '',
     };
 
     const lines = content.split('\n');
@@ -116,39 +89,86 @@ class ScriptService {
           metadata.author = value.replace(/["']/g, '');
         }
       }
+
+      if (trimmed.startsWith('version = ')) {
+        const value = trimmed.split('=')[1]?.trim();
+        if (value) {
+          metadata.version = value.replace(/["']/g, '');
+        }
+      }
     }
 
     return metadata;
   }
 
-  async getScripts() {
-    // Refresh data if needed
-    if (this.moduleScripts.length === 0 && this.commandScripts.length === 0) {
-      await this.initialize();
+  private async loadScriptsFromGitHub(scriptType: 'module' | 'command'): Promise<ScriptMetadata[]> {
+    try {
+      const files = await this.fetchGitHubDirectory(scriptType);
+      const scripts: ScriptMetadata[] = [];
+
+      for (const file of files) {
+        if (file.type === 'file' && file.name.endsWith('.lua')) {
+          try {
+            const content = await this.fetchScriptContent(file.download_url);
+            const metadata = this.parseScriptMetadata(content, scriptType, file.name);
+            
+            if (!metadata.name) {
+              metadata.name = file.name.replace('.lua', '');
+            }
+
+            scripts.push(metadata);
+          } catch (err) {
+            console.error(`Error processing script ${file.name}:`, err);
+          }
+        }
+      }
+
+      return scripts;
+    } catch (error) {
+      console.error(`Error loading ${scriptType} scripts from GitHub:`, error);
+      return [];
     }
+  }
+
+  async getScripts() {
+    const now = Date.now();
     
-    return {
-      module: this.moduleScripts,
-      command: this.commandScripts,
-    };
+    if (this.cache && now < this.cacheExpiry) {
+      return this.cache;
+    }
+
+    try {
+      const [moduleScripts, commandScripts] = await Promise.all([
+        this.loadScriptsFromGitHub('module'),
+        this.loadScriptsFromGitHub('command')
+      ]);
+
+      this.cache = {
+        module: moduleScripts,
+        command: commandScripts,
+      };
+      this.cacheExpiry = now + this.CACHE_DURATION;
+
+      return this.cache;
+    } catch (error) {
+      console.error('Error fetching scripts from GitHub:', error);
+      return this.cache || { module: [], command: [] };
+    }
   }
 
   async getScript(scriptType: 'module' | 'command', scriptName: string): Promise<string> {
-    const normalizedName = scriptName.toLowerCase();
-    const fileName = this.nameToFile.get(scriptType)?.get(normalizedName);
-    
-    if (!fileName) {
-      throw new Error('Script not found');
-    }
-
-    const baseDir = scriptType === 'module' ? this.moduleDir : this.commandDir;
-    const filePath = path.join(baseDir, `${fileName}.lua`);
-    
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
-      return content;
-    } catch {
-      throw new Error('Failed to read script file');
+      const files = await this.fetchGitHubDirectory(scriptType);
+      const file = files.find(f => f.name.replace('.lua', '').toLowerCase() === scriptName.toLowerCase());
+      
+      if (!file) {
+        throw new Error('Script not found');
+      }
+
+      return await this.fetchScriptContent(file.download_url);
+    } catch (error) {
+      console.error(`Error fetching script ${scriptName}:`, error);
+      throw new Error('Failed to fetch script');
     }
   }
 }

@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Add CORS headers
+ 
   const origin = req.headers.origin;
   if (origin === 'https://marketplace.flarial.xyz') {
     res.setHeader('Access-Control-Allow-Origin', origin);

@@ -17,12 +17,12 @@ export function ConfigCard({ config }: ConfigCardProps) {
   const [isFadingIn, setIsFadingIn] = useState(false);
 
   useEffect(() => {
-    // Trigger fade-in animation after the overlay is added to the DOM
+   
     setIsFadingIn(showFullImage);
   }, [showFullImage]);
 
   useEffect(() => {
-    // Show/hide scroll bar
+   
     document.body.style.overflow = showFullImage ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
@@ -30,10 +30,10 @@ export function ConfigCard({ config }: ConfigCardProps) {
   }, [showFullImage]);
 
   const closeOverlay = () => {
-    setIsFadingIn(false); // Start fade-out animation
+    setIsFadingIn(false);
     setTimeout(() => {
       setShowFullImage(false);
-    }, 500); // Duration of the CSS transition
+    }, 500);
   };
 
   const handleDownload = async () => {

@@ -39,7 +39,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
 
   const handleDownload = async () => {
     try {
-      const response = await getScriptDownloadResponse(script.name, script.type);
+      const response = await getScriptDownloadResponse(script);
       
       const contentDisposition = response.headers.get('content-disposition');
       const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/) || [];
@@ -58,11 +58,11 @@ export function ScriptCard({ script }: ScriptCardProps) {
       setIsDropdownOpen(false);
     } catch (error) {
       console.error('Error downloading script:', error);
-      // TODO: Add user-facing error notification
+     
     }
   };
 
-  // Utility to capitalize the first letter of the script type
+ 
   const capitalizeFirstLetter = (str: string): string => {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();

@@ -35,7 +35,7 @@ class ConfigService {
           const metadataContent = await fs.readFile(metadataPath, 'utf-8');
           const configInfo = JSON.parse(metadataContent) as ConfigMetadata;
           
-          // Ensure essential fields exist
+         
           if (!configInfo.name) {
             configInfo.name = entry.name;
           }
@@ -82,7 +82,7 @@ class ConfigService {
     const actualConfigName = await this.findConfigDirCaseInsensitive(configID);
     const configDir = path.join(this.baseDir, actualConfigName);
     
-    // Check if directory exists
+   
     try {
       const stat = await fs.stat(configDir);
       if (!stat.isDirectory()) {
@@ -103,7 +103,7 @@ class ConfigService {
       });
       archive.on('error', reject);
 
-      // Add all files from the config directory
+     
       archive.directory(configDir, false);
       archive.finalize();
     });
@@ -124,7 +124,7 @@ export const configsRouter = createTRPCRouter({
     }))
     .query(async ({ input }) => {
       const iconBuffer = await configService.getConfigIcon(input.configId);
-      // Convert buffer to base64 for transmission
+     
       return {
         data: iconBuffer.toString('base64'),
         contentType: 'image/png',

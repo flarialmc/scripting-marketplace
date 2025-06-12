@@ -1,18 +1,18 @@
-// src/app/api/upload-config/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth'; // Import from separate file
+import { authOptions } from '@/lib/auth';
 
-// Store to track user uploads and configs
-const userUploadTracker = new Map<string, number>(); // Key: identifier, Value: timestamp (ms)
-const ipConfigTracker = new Map<string, string>(); // Key: IP, Value: config name
-const discordConfigTracker = new Map<string, string>(); // Key: Discord ID, Value: config name
+
+const userUploadTracker = new Map<string, number>();
+const ipConfigTracker = new Map<string, string>();
+const discordConfigTracker = new Map<string, string>();
 const processingRequests = new Set<string>();
 
-// Time limit: 24 hours in milliseconds
+
 const UPLOAD_COOLDOWN = 24 * 60 * 60 * 1000;
 
-// Bad words list (expand as needed)
+
 const BAD_WORDS = [     
   "nigger", "nigga", "fuck", "shit", "bitch", "asshole", "cunt", "faggot", "retard", "whore",
   "dick", "pussy", "bastard", "slut", "hell", "cock", "tits", "prick", "chink",
@@ -33,7 +33,7 @@ const BAD_WORDS = [
   "raand", "randi", "chuda", "madarchod", "anshul", "chutiya", "ammi", "bari", "ashank", "mbg", "test"
 ].map(word => word.toLowerCase());
 
-// Discord Embed interface
+
 interface DiscordEmbed {
   title: string;
   fields: { name: string; value: string; inline: boolean }[];
@@ -41,31 +41,31 @@ interface DiscordEmbed {
   timestamp: string;
 }
 
-// GitHub PR interface (simplified)
+
 interface GitHubPR {
   title: string;
 }
 
-// Helper to get unique user identifier
+
 function getUserIdentifier(request: NextRequest, discordId: string): string {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
   const cookies = request.cookies;
   const cookieId = cookies.get('user_id')?.value || `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-  return `${ip}-${discordId}-${cookieId}`; // Include discordId for uniqueness
+  return `${ip}-${discordId}-${cookieId}`;
 }
 
-// Helper to generate ID from name
+
 function generateIdFromName(name: string): string {
   return name.replace(/\s+/g, '').toLowerCase();
 }
 
-// Helper to check for bad words anywhere in the name
+
 function containsBadWords(name: string): boolean {
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   return BAD_WORDS.some(badWord => normalizedName.includes(badWord));
 }
 
-// Helper to check for existing PRs with the same name (case-insensitive)
+
 async function checkExistingPR(name: string, githubToken: string): Promise<boolean> {
   const repoOwner = 'flarialmc';
   const repoName = 'scripting-marketplace';
@@ -85,7 +85,7 @@ async function checkExistingPR(name: string, githubToken: string): Promise<boole
   return prs.some(pr => generateIdFromName(pr.title.replace('Add config: ', '')) === normalizedName);
 }
 
-// Helper to send Discord webhook notification (no icon)
+
 async function sendWebhookNotification(ip: string, configName: string, username: string) {
   const webhookUrl = process.env.WEBHOOK;
   if (!webhookUrl) {
@@ -100,7 +100,7 @@ async function sendWebhookNotification(ip: string, configName: string, username:
       { name: 'Username', value: username, inline: true },
       { name: 'IP', value: ip, inline: true },
     ],
-    color: 0x00ff00, // Green
+    color: 0x00ff00,
     timestamp: new Date().toISOString(),
   };
 
@@ -121,15 +121,15 @@ async function sendWebhookNotification(ip: string, configName: string, username:
 
 export async function POST(request: NextRequest) {
   try {
-    // Get session to verify user
+   
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
       console.log('Unauthorized upload attempt');
       return NextResponse.json({ error: 'Unauthorized: Please sign in with Discord' }, { status: 401 });
     }
 
-    const discordId = session.user.id; // Discord ID from session
-    const username = session.user.name || 'Unknown'; // Username from session
+    const discordId = session.user.id;
+    const username = session.user.name || 'Unknown';
     const userIdentifier = getUserIdentifier(request, discordId);
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
     console.log(`User identifier: ${userIdentifier}, IP: ${ip}, Discord ID: ${discordId}`);
@@ -203,17 +203,17 @@ export async function POST(request: NextRequest) {
     });
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
 
-    // Always generate main.json from form data, using session username
+   
     const mainJsonContent = JSON.stringify({
       id: generatedId,
       name: configData.name,
       version: configData.version,
-      author: username, // From session, not client
+      author: username,
       createdAt: new Date().toISOString(),
     }, null, 2);
     const updatedFiles = [
       new File([mainJsonContent], 'main.json', { type: 'application/json' }),
-      ...files.filter(f => f.name !== 'main.json'), // Override existing main.json if present
+      ...files.filter(f => f.name !== 'main.json'),
     ];
 
     const treeItems = [];
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
 
-    // Send Discord webhook notification (no icon)
+   
     await sendWebhookNotification(ip, name, username);
 
     ipConfigTracker.set(ip, folderName);

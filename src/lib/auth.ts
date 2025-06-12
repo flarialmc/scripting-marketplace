@@ -1,8 +1,8 @@
-// src/lib/auth.ts
+
 import { NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
-// Define the shape of the user object that will be added to the session
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, token }) {
       if (session.user && token.sub) {
-        session.user.id = token.sub; // Discord ID
+        session.user.id = token.sub;
       }
       return session;
     },
