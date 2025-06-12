@@ -21,7 +21,7 @@ export async function listConfigs(): Promise<Config[]> {
 
     const data = await response.json() as ConfigsResponse;
     return data.configs || [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }

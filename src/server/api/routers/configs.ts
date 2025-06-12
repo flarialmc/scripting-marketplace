@@ -67,7 +67,7 @@ class ConfigService {
       );
 
       return configs;
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -84,7 +84,7 @@ class ConfigService {
       this.cache = configs;
       this.cacheExpiry = now + this.CACHE_DURATION;
       return configs;
-    } catch (error) {
+    } catch {
       const fallback = this.cache || [];
       return fallback;
     }
@@ -110,7 +110,7 @@ class ConfigService {
         data: Buffer.from(buffer).toString('base64'),
         contentType: 'image/png',
       };
-    } catch (error) {
+    } catch {
       throw new Error('Icon not found');
     }
   }
@@ -130,7 +130,7 @@ class ConfigService {
         filename: `${configId}.zip`,
         contentType: 'application/zip',
       };
-    } catch (error) {
+    } catch {
       throw new Error('Config archive not found');
     }
   }

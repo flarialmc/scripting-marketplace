@@ -25,7 +25,7 @@ export async function listScripts(): Promise<Script[]> {
     const data = await response.json() as ScriptsResponse;
    
     return [...(data.module || []), ...(data.command || [])];
-  } catch (error) {
+  } catch {
     return [];
   }
 }

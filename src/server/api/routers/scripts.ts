@@ -77,7 +77,7 @@ class ScriptService {
       );
 
       return scripts;
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -102,7 +102,7 @@ class ScriptService {
       this.cacheExpiry = now + this.CACHE_DURATION;
 
       return this.cache;
-    } catch (error) {
+    } catch {
       const fallback = this.cache || { module: [], command: [] };
       return fallback;
     }
@@ -120,7 +120,7 @@ class ScriptService {
       }
 
       return await this.fetchScriptContent(scriptType, entry.filename);
-    } catch (error) {
+    } catch {
       throw new Error('Failed to fetch script');
     }
   }
