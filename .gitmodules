@@ -1,3 +1,6 @@
 [submodule "backend/scripts"]
 	path = backend/scripts
 	url = https://github.com/flarialmc/scripts.git
+[submodule "frontend/scripts"]
+	path = frontend/scripts
+	url = https://github.com/flarialmc/scripts.git

@@ -1,99 +1,36 @@
-# Flarial Scripting Marketplace
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A web-based marketplace for discovering, sharing, and downloading Flarial scripts. Browse available scripts, view their details, and easily download them for use in your Flarial projects.
+## Getting Started
 
-## Features
+First, run the development server:
 
-- 🌐 Browse available Flarial scripts
-- 📖 View detailed script information (name, description, version, author)
-- ⬇️ Download scripts as packaged archives
-- 🎨 Modern, responsive UI built with Next.js and TailwindCSS
-
-## Tech Stack
-
-### Frontend
-- Next.js 15
-- React 19
-- TypeScript
-- TailwindCSS
-- ESLint
-
-### Backend
-- Go 1.23.6
-- RESTful API with OpenAPI documentation
-
-## Setup
-
-### Prerequisites
-- Node.js (for frontend)
-- Go 1.23.6+ (for backend)
-
-### Frontend Setup
-1. Navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-The frontend will be available at `http://localhost:3000`
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Backend Setup
-1. Navigate to the backend directory:
-```bash
-cd backend
-```
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-2. Start the server:
-```bash
-go run cmd/server/main.go
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-The API will be available at `http://localhost:8080`
+## Learn More
 
-## Development
+To learn more about Next.js, take a look at the following resources:
 
-### Frontend Development
-- `npm run dev` - Start development server with hot reloading
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Backend Development
-The backend follows standard Go project layout:
-- `/cmd/server` - Main application entry point
-- `/internal/api` - API implementation
-- `/docs` - OpenAPI documentation
-- `/scripts` - Script storage directory
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## API Documentation
+## Deploy on Vercel
 
-API documentation is available in OpenAPI format at `backend/docs/openapi.yaml`. Key endpoints:
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- `GET /api/scripts/{scriptId}/download` - Download a script package
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Contribution Guidelines
-- Follow existing code style and conventions
-- Include tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting PR
-
-## License
-
-This project is proprietary software. All rights reserved.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
