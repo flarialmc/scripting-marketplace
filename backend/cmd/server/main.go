@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"fmt"
 	"backend/internal/api/handlers/scripts"
 	"backend/internal/api/handlers/configs"
 )
@@ -83,8 +82,7 @@ func main() {
 		case strings.HasSuffix(path, "/download"):
 			configHandler.HandleDownloadConfig(w, r)
 		case strings.HasSuffix(path, "/icon.png"):
-			imagePath := fmt.Sprintf("configs/%s/icon.png", strings.TrimSuffix(path, "/icon.png"))
-			http.ServeFile(w, r, imagePath)
+			configHandler.HandleIconRequest(w, r)
 		default:
 			http.NotFound(w, r)
 		}

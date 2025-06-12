@@ -136,6 +136,22 @@ func (h *ConfigHandler) HandleListConfigs(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// findConfigDirCaseInsensitive finds the actual directory name for a config ID case-insensitively
+func (h *ConfigHandler) findConfigDirCaseInsensitive(configID string) (string, error) {
+	entries, err := os.ReadDir(h.baseDir)
+	if err != nil {
+		return "", err
+	}
+
+	lowerConfigID := strings.ToLower(configID)
+	for _, entry := range entries {
+		if entry.IsDir() && strings.ToLower(entry.Name()) == lowerConfigID {
+			return entry.Name(), nil
+		}
+	}
+	return "", fmt.Errorf("config not found")
+}
+
 // HandleDownloadConfig handles GET requests to download a config as a zip archive
 func (h *ConfigHandler) HandleDownloadConfig(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -151,7 +167,15 @@ func (h *ConfigHandler) HandleDownloadConfig(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	configDir := filepath.Join(h.baseDir, configID)
+	// Find the actual directory name case-insensitively
+	actualConfigName, err := h.findConfigDirCaseInsensitive(configID)
+	if err != nil {
+		log.Printf("Config directory not found: %s", configID)
+		http.Error(w, "Config not found", http.StatusNotFound)
+		return
+	}
+
+	configDir := filepath.Join(h.baseDir, actualConfigName)
 	absPath, err := filepath.Abs(configDir)
 	if err != nil || !strings.HasPrefix(absPath, h.baseDir) {
 		log.Printf("Invalid config directory: %s", configDir)
@@ -166,7 +190,7 @@ func (h *ConfigHandler) HandleDownloadConfig(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.Header().Set("Content-Type", "application/x-zip-compressed")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.zip\"", configID))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.zip\"", actualConfigName))
 
 	zw := zip.NewWriter(w)
 	defer zw.Close()
@@ -222,4 +246,31 @@ func (h *ConfigHandler) HandleDownloadConfig(w http.ResponseWriter, r *http.Requ
 		log.Printf("Error creating archive: %v", err)
 		http.Error(w, "Error creating archive", http.StatusInternalServerError)
 	}
+}
+
+// HandleIconRequest handles GET requests for config icons case-insensitively
+func (h *ConfigHandler) HandleIconRequest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	path := strings.TrimPrefix(r.URL.Path, "/api/configs/")
+	configID := strings.TrimSuffix(path, "/icon.png")
+
+	if strings.Contains(configID, "..") {
+		http.Error(w, "Invalid config ID", http.StatusBadRequest)
+		return
+	}
+
+	// Find the actual directory name case-insensitively
+	actualConfigName, err := h.findConfigDirCaseInsensitive(configID)
+	if err != nil {
+		log.Printf("Config directory not found: %s", configID)
+		http.Error(w, "Config not found", http.StatusNotFound)
+		return
+	}
+
+	imagePath := filepath.Join(h.baseDir, actualConfigName, "icon.png")
+	http.ServeFile(w, r, imagePath)
 }
