@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 
 const userUploadTracker = new Map<string, number>();
 const ipConfigTracker = new Map<string, string>();
-const discordConfigTracker = new Map<string, string>();
+const githubConfigTracker = new Map<string, string>();
 const processingRequests = new Set<string>();
 
 
@@ -47,11 +47,11 @@ interface GitHubPR {
 }
 
 
-function getUserIdentifier(request: NextRequest, discordId: string): string {
+function getUserIdentifier(request: NextRequest, githubId: string): string {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
   const cookies = request.cookies;
   const cookieId = cookies.get('user_id')?.value || `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-  return `${ip}-${discordId}-${cookieId}`;
+  return `${ip}-${githubId}-${cookieId}`;
 }
 
 
@@ -125,14 +125,15 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
       console.log('Unauthorized upload attempt');
-      return NextResponse.json({ error: 'Unauthorized: Please sign in with Discord' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: Please sign in with GitHub' }, { status: 401 });
     }
 
-    const discordId = session.user.id;
+    const githubId = session.user.id;
     const username = session.user.name || 'Unknown';
-    const userIdentifier = getUserIdentifier(request, discordId);
+    const githubLogin = session.user.login || username;
+    const userIdentifier = getUserIdentifier(request, githubId);
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
-    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, Discord ID: ${discordId}`);
+    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, GitHub ID: ${githubId}`);
 
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
@@ -151,9 +152,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only one config upload allowed per IP' }, { status: 403 });
     }
 
-    if (discordConfigTracker.has(discordId)) {
-      console.log(`Blocked upload: Discord user ${discordId} already has config "${discordConfigTracker.get(discordId)}"`);
-      return NextResponse.json({ error: 'Only one config upload allowed per Discord user' }, { status: 403 });
+    if (githubConfigTracker.has(githubId)) {
+      console.log(`Blocked upload: GitHub user ${githubId} already has config "${githubConfigTracker.get(githubId)}"`);
+      return NextResponse.json({ error: 'Only one config upload allowed per GitHub user' }, { status: 403 });
     }
 
     const githubToken = process.env.GITHUB_TOKEN;
@@ -220,7 +221,7 @@ export async function POST(request: NextRequest) {
     for (const file of updatedFiles) {
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
       const baseFileName = file.name.split('/').pop() || file.name;
-      const filePath = `backend/configs/${folderName}/${baseFileName}`;
+      const filePath = `configs/${folderName}/${baseFileName}`;
       const blobResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/blobs`, {
         method: 'POST',
         headers,
@@ -242,7 +243,16 @@ export async function POST(request: NextRequest) {
     const commitResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/commits`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ message: `Add ${folderName} configuration`, tree: treeData.sha, parents: [baseSha] }),
+      body: JSON.stringify({ 
+        message: `Add ${folderName} configuration`, 
+        tree: treeData.sha, 
+        parents: [baseSha],
+        author: {
+          name: username,
+          email: session.user.email || `${githubLogin}@users.noreply.github.com`,
+          date: new Date().toISOString()
+        }
+      }),
     });
     if (!commitResponse.ok) throw new Error(`Failed to create commit: ${await commitResponse.text()}`);
     const commitData = await commitResponse.json();
@@ -261,7 +271,7 @@ export async function POST(request: NextRequest) {
         title: `Add config: ${folderName}`,
         head: newBranch,
         base: baseBranch,
-        body: `This PR adds the ${folderName} configuration to backend/configs/. Please review and merge.`,
+        body: `This PR adds the ${folderName} configuration to configs/.\n\nSubmitted by: @${githubLogin}\nConfig Name: ${configData.name}\nVersion: ${configData.version}\nAuthor: ${username}\n\nPlease review and merge.`,
       }),
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
@@ -270,7 +280,7 @@ export async function POST(request: NextRequest) {
     await sendWebhookNotification(ip, name, username);
 
     ipConfigTracker.set(ip, folderName);
-    discordConfigTracker.set(discordId, folderName);
+    githubConfigTracker.set(githubId, folderName);
     userUploadTracker.set(userIdentifier, currentTime);
 
     const response = NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });

@@ -7,7 +7,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' https://1klcjc8um5aq.flarial.xyz https://cloudflareinsights.com https://discord.com https://raw.githubusercontent.com;",
+            value: "default-src 'self'; connect-src 'self' https://1klcjc8um5aq.flarial.xyz https://cloudflareinsights.com https://github.com https://api.github.com https://raw.githubusercontent.com;",
           },
         ],
       },

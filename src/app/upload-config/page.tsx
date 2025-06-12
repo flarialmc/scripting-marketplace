@@ -128,7 +128,7 @@ function ConfigUploadInner() {
 
   const handleSubmit = async () => {
     if (!session) {
-      setError('Please sign in with Discord to submit a config');
+      setError('Please sign in with GitHub to submit a config');
       return;
     }
     if (!formData.name) {
@@ -143,7 +143,8 @@ function ConfigUploadInner() {
       : files;
     updatedFiles.forEach(file => formDataToSend.append('files', file));
     formDataToSend.append('configData', JSON.stringify(formData));
-    formDataToSend.append('discordId', session.user.id);
+    formDataToSend.append('githubId', session.user.id);
+    formDataToSend.append('githubLogin', session.user.login || session.user.name || '');
 
     try {
       const response = await fetch('/api/upload-config', {
@@ -211,7 +212,7 @@ function ConfigUploadInner() {
           {session ? (
             <h2 className="text-xl font-semibold text-white mb-6">Submit Config</h2>
           ) : (
-            <h2 className="text-xl font-semibold text-white mb-6">Sign-in to Submit Config</h2>
+            <h2 className="text-xl font-semibold text-white mb-6">Sign-in with GitHub to Submit Config</h2>
           )}
 
           <div className="mb-6">
@@ -220,17 +221,17 @@ function ConfigUploadInner() {
                 <p className="text-white">Signed in as {session.user.name}</p>
                 <button
                   onClick={() => signOut()}
-                  className="bg-[#5865F2] text-white px-4 py-2 rounded-md hover:bg-[#4752C4]"
+                  className="bg-[#24292e] text-white px-4 py-2 rounded-md hover:bg-[#1b1f23] transition-colors"
                 >
                   Sign out
                 </button>
               </div>
             ) : (
               <button
-                onClick={() => signIn('discord')}
-                className="bg-[#5865F2] text-white px-6 py-2 rounded-md hover:bg-[#4752C4]"
+                onClick={() => signIn('github')}
+                className="bg-[#24292e] text-white px-6 py-2 rounded-md hover:bg-[#1b1f23] transition-colors"
               >
-                Sign in with Discord
+                Sign in with GitHub
               </button>
             )}
           </div>
