@@ -35,24 +35,26 @@ export async function listScripts(): Promise<Script[]> {
 
 export async function getScriptDownloadResponse(script: Script): Promise<Response> {
   try {
-    // Convert GitHub raw URL to Statically CDN URL to bypass servers
-    const url = script.downloadUrl?.replace(
-      'https://raw.githubusercontent.com/',
-      'https://cdn.statically.io/gh/'
-    ) || `https://cdn.statically.io/gh/flarialmc/lua-scripts/main/scripts/${script.type}/${script.name}.lua`;
+    // Use the server-side proxy endpoint to avoid CORS issues
+    const url = `${API_CONFIG.BASE_URL}/api/scripts/${script.type}/${script.filename}/download`;
     
-    console.log('Downloading script from Statically CDN:', url);
+    console.log('Downloading script via server proxy:', url);
+    console.log('Script metadata:', { name: script.name, type: script.type });
     
     const response = await fetch(url, {
       method: 'GET',
       cache: 'no-store',
-      mode: 'cors',
+      headers: {
+        'Accept': 'application/octet-stream, */*',
+      },
     });
     
     if (!response.ok) {
+      console.error(`Failed to fetch from server proxy: ${response.status} ${response.statusText}`);
       throw new Error(`Failed to download script: ${response.statusText}`);
     }
     
+    console.log('Successfully fetched script via server proxy');
     return response;
   } catch (error) {
     console.error('Error downloading script:', error);

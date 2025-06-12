@@ -9,6 +9,7 @@ interface ScriptMetadata {
   type: 'module' | 'command';
   version: string;
   downloadUrl: string;
+  filename: string;
   createdAt: string;
   updatedAt: string;
   imageUrl: string;
@@ -40,6 +41,21 @@ class ScriptService {
   }
 
   private async fetchScriptContent(downloadUrl: string): Promise<string> {
+    // Try Statically.io first as it's more reliable for raw file access
+    const staticUrl = downloadUrl.replace('https://raw.githubusercontent.com/', 'https://cdn.statically.io/gh/');
+    
+    try {
+      console.log('Trying Statically.io:', staticUrl);
+      const response = await fetch(staticUrl);
+      if (response.ok) {
+        return response.text();
+      }
+      console.log('Statically.io failed, falling back to GitHub raw');
+    } catch (error) {
+      console.log('Statically.io error, falling back to GitHub raw:', error);
+    }
+
+    // Fallback to GitHub raw
     const response = await fetch(downloadUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch script content: ${response.statusText}`);
@@ -55,7 +71,8 @@ class ScriptService {
       author: '',
       type: scriptType,
       version: '1.0.0',
-      downloadUrl: `https://raw.githubusercontent.com/flarialmc/scripts/main/${scriptType}/${fileName}`,
+      downloadUrl: `https://cdn.statically.io/gh/flarialmc/scripts/main/${scriptType}/${fileName}`,
+      filename: fileName.replace('.lua', ''),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       imageUrl: '',

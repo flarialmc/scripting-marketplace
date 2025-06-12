@@ -5,6 +5,7 @@ export interface Script {
   version: string;
   author: string;
   downloadUrl: string;
+  filename: string;
   createdAt: string;
   updatedAt: string;
   imageUrl:string;
