@@ -1,0 +1,454 @@
+[
+    {
+        "name": "textalignment",
+        "value": "Center"
+    },
+    {
+        "name": "keybind",
+        "value": "K"
+    },
+    {
+        "name": "textShadow",
+        "value": false
+    },
+    {
+        "name": "enabled",
+        "value": true
+    },
+    {
+        "name": "colors_secondary2_rgb",
+        "value": false
+    },
+    {
+        "name": "responsivewidth",
+        "value": false
+    },
+    {
+        "name": "favorite",
+        "value": false
+    },
+    {
+        "name": "colors_primary1",
+        "value": "ff223a"
+    },
+    {
+        "name": "percentageX",
+        "value": 0.0
+    },
+    {
+        "name": "rectShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "textscale",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_mod4",
+        "value": 1.0
+    },
+    {
+        "name": "borderOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "percentageY",
+        "value": 0.0
+    },
+    {
+        "name": "colors_secondary8",
+        "value": "302728"
+    },
+    {
+        "name": "border",
+        "value": false
+    },
+    {
+        "name": "borderWidth",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary2",
+        "value": "ffffff"
+    },
+    {
+        "name": "reversepaddingx",
+        "value": false
+    },
+    {
+        "name": "colors_text_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_primary3",
+        "value": "9a6b72"
+    },
+    {
+        "name": "reversepaddingy",
+        "value": false
+    },
+    {
+        "name": "padx",
+        "value": 0.0
+    },
+    {
+        "name": "BlurEffect",
+        "value": false
+    },
+    {
+        "name": "textShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "o_colors_primary1",
+        "value": 0.29919785261154175
+    },
+    {
+        "name": "bgColor",
+        "value": "000000"
+    },
+    {
+        "name": "pady",
+        "value": 0.0
+    },
+    {
+        "name": "rectwidth",
+        "value": 1.0
+    },
+    {
+        "name": "rectheight",
+        "value": 1.0
+    },
+    {
+        "name": "rounding",
+        "value": 32.0
+    },
+    {
+        "name": "textRGB",
+        "value": false
+    },
+    {
+        "name": "colors_text",
+        "value": "ffffff"
+    },
+    {
+        "name": "textColor",
+        "value": "fafafa"
+    },
+    {
+        "name": "colors_primary2_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary6",
+        "value": "ff2438"
+    },
+    {
+        "name": "borderColor",
+        "value": "000000"
+    },
+    {
+        "name": "rectShadow",
+        "value": false
+    },
+    {
+        "name": "textShadowRGB",
+        "value": false
+    },
+    {
+        "name": "rectShadowRGB",
+        "value": false
+    },
+    {
+        "name": "colors_enabled",
+        "value": "188830"
+    },
+    {
+        "name": "colors_secondary5_rgb",
+        "value": false
+    },
+    {
+        "name": "textShadowOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "rectShadowCol",
+        "value": "00000"
+    },
+    {
+        "name": "rectShadowOffset",
+        "value": 0.003000000026077032
+    },
+    {
+        "name": "bgOpacity",
+        "value": 0.550000011920929
+    },
+    {
+        "name": "textOpacity",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary3_rgb",
+        "value": false
+    },
+    {
+        "name": "bgRGB",
+        "value": false
+    },
+    {
+        "name": "borderRGB",
+        "value": false
+    },
+    {
+        "name": "o_colors_text",
+        "value": 1.0
+    },
+    {
+        "name": "uiscale",
+        "value": 0.6499999761581421
+    },
+    {
+        "name": "rotation",
+        "value": 0.0
+    },
+    {
+        "name": "o_colors_enabled",
+        "value": 1.0
+    },
+    {
+        "name": "editmenubind",
+        "value": "L"
+    },
+    {
+        "name": "custom_logo",
+        "value": false
+    },
+    {
+        "name": "colors_enabled_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_disabled",
+        "value": "7d1820"
+    },
+    {
+        "name": "o_colors_disabled",
+        "value": 1.0
+    },
+    {
+        "name": "colors_disabled_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_primary1_rgb",
+        "value": false
+    },
+    {
+        "name": "o_colors_primary2",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_primary3",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary4",
+        "value": "704b52"
+    },
+    {
+        "name": "o_colors_primary4",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_secondary8",
+        "value": 1.0
+    },
+    {
+        "name": "colors_primary4_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary1",
+        "value": "352c2d"
+    },
+    {
+        "name": "o_colors_secondary1",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary1_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary2",
+        "value": "463b3d"
+    },
+    {
+        "name": "o_colors_secondary2",
+        "value": 0.2992019057273865
+    },
+    {
+        "name": "colors_secondary3",
+        "value": "100c0d"
+    },
+    {
+        "name": "o_colors_secondary3",
+        "value": 0.5131036639213562
+    },
+    {
+        "name": "colors_secondary3_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary4",
+        "value": "211b1b"
+    },
+    {
+        "name": "o_colors_secondary4",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary4_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary5",
+        "value": "8b1b25"
+    },
+    {
+        "name": "o_colors_secondary5",
+        "value": 1.0
+    },
+    {
+        "name": "o_colors_secondary6",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary6_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary7",
+        "value": "943c3c"
+    },
+    {
+        "name": "o_colors_secondary7",
+        "value": 1.0
+    },
+    {
+        "name": "colors_secondary7_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_secondary8_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod1",
+        "value": "1f191a"
+    },
+    {
+        "name": "o_colors_mod1",
+        "value": 0.6307507753372192
+    },
+    {
+        "name": "colors_mod1_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod2",
+        "value": "2f2022"
+    },
+    {
+        "name": "o_colors_mod2",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod2_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod3",
+        "value": "3f2a2d"
+    },
+    {
+        "name": "o_colors_mod3",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod3_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod4",
+        "value": "705d60"
+    },
+    {
+        "name": "colors_mod4_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_modicon",
+        "value": "1A1313"
+    },
+    {
+        "name": "o_colors_modicon",
+        "value": 1.0
+    },
+    {
+        "name": "colors_modicon_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_FlarialLogo",
+        "value": "fe4342"
+    },
+    {
+        "name": "o_colors_FlarialLogo",
+        "value": 1.0
+    },
+    {
+        "name": "colors_FlarialLogo_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_mod_settings_icon",
+        "value": "FFFFFF"
+    },
+    {
+        "name": "o_colors_mod_settings_icon",
+        "value": 1.0
+    },
+    {
+        "name": "colors_mod_settings_icon_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_radiobutton_enabled",
+        "value": "D0A0A8"
+    },
+    {
+        "name": "o_colors_radiobutton_enabled",
+        "value": 1.0
+    },
+    {
+        "name": "colors_radiobutton_enabled_rgb",
+        "value": false
+    },
+    {
+        "name": "colors_radiobutton_disabled",
+        "value": "FFFFFF"
+    },
+    {
+        "name": "o_colors_radiobutton_disabled",
+        "value": 1.0
+    },
+    {
+        "name": "colors_radiobutton_disabled_rgb",
+        "value": false
+    }
+]
