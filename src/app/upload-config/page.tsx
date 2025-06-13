@@ -162,7 +162,6 @@ function ConfigUploadInner() {
       setShowSuccessPopup(true);
       resetForm();
     } catch (err) {
-      console.error('Submit error:', err);
       setError(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsUploading(false);

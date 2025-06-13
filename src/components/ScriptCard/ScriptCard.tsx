@@ -57,7 +57,6 @@ export function ScriptCard({ script }: ScriptCardProps) {
       window.URL.revokeObjectURL(url);
       setIsDropdownOpen(false);
     } catch (error) {
-      console.error('Error downloading script:', error);
      
     }
   };

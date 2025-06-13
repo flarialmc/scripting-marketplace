@@ -49,7 +49,6 @@ export function ConfigCard({ config }: ConfigCardProps) {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading config:', error);
     }
   };
 

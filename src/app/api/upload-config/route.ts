@@ -78,7 +78,6 @@ async function checkExistingPR(name: string, githubToken: string): Promise<boole
   const normalizedName = generateIdFromName(name);
   const prsResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/pulls?state=all`, { headers });
   if (!prsResponse.ok) {
-    console.error(`Failed to fetch PRs: ${await prsResponse.text()}`);
     return false;
   }
   const prs: GitHubPR[] = await prsResponse.json();
@@ -89,7 +88,6 @@ async function checkExistingPR(name: string, githubToken: string): Promise<boole
 async function sendWebhookNotification(ip: string, configName: string, username: string) {
   const webhookUrl = process.env.WEBHOOK;
   if (!webhookUrl) {
-    console.error('Webhook URL not configured in .env');
     return;
   }
 
@@ -113,9 +111,7 @@ async function sendWebhookNotification(ip: string, configName: string, username:
     if (!response.ok) {
       throw new Error(`Webhook failed: ${await response.text()}`);
     }
-    console.log('Webhook notification sent successfully');
   } catch (error) {
-    console.error('Failed to send webhook notification:', error);
   }
 }
 
@@ -124,8 +120,7 @@ export async function POST(request: NextRequest) {
    
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-      console.log('Unauthorized upload attempt');
-      return NextResponse.json({ error: 'Unauthorized: Please sign in with GitHub' }, { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized: Please sign in with GitHub' }, { status: 401 });
     }
 
     const githubId = session.user.id;
@@ -133,7 +128,6 @@ export async function POST(request: NextRequest) {
     const githubLogin = session.user.login || username;
     const userIdentifier = getUserIdentifier(request, githubId);
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown-ip';
-    console.log(`User identifier: ${userIdentifier}, IP: ${ip}, GitHub ID: ${githubId}`);
 
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
@@ -143,17 +137,14 @@ export async function POST(request: NextRequest) {
     const generatedId = generateIdFromName(name);
 
     if (containsBadWords(name)) {
-      console.log(`Blocked upload: Name "${name}" contains prohibited words`);
       return NextResponse.json({ error: 'Config name contains prohibited words' }, { status: 400 });
     }
 
     if (ipConfigTracker.has(ip)) {
-      console.log(`Blocked upload: IP ${ip} already has config "${ipConfigTracker.get(ip)}"`);
       return NextResponse.json({ error: 'Only one config upload allowed per IP' }, { status: 403 });
     }
 
     if (githubConfigTracker.has(githubId)) {
-      console.log(`Blocked upload: GitHub user ${githubId} already has config "${githubConfigTracker.get(githubId)}"`);
       return NextResponse.json({ error: 'Only one config upload allowed per GitHub user' }, { status: 403 });
     }
 
@@ -161,7 +152,6 @@ export async function POST(request: NextRequest) {
     if (!githubToken) throw new Error('GitHub token not configured');
     const prExists = await checkExistingPR(name, githubToken);
     if (prExists) {
-      console.log(`Blocked upload: PR with name "${name}" (ID: ${generatedId}) already exists`);
       return NextResponse.json({ error: 'A pull request with this config name already exists' }, { status: 409 });
     }
 
@@ -289,7 +279,6 @@ export async function POST(request: NextRequest) {
     }
     return response;
   } catch (error) {
-    console.error('API error:', error);
     return NextResponse.json(
       { error: `Failed to create pull request: ${error instanceof Error ? error.message : String(error)}` },
       { status: 500 }
