@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
   try {
    
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
+    if (!session || !session.user?.id || !session.accessToken) {
         return NextResponse.json({ error: 'Unauthorized: Please sign in with GitHub' }, { status: 401 });
     }
 
@@ -148,9 +148,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only one config upload allowed per GitHub user' }, { status: 403 });
     }
 
-    const githubToken = process.env.GITHUB_TOKEN;
-    if (!githubToken) throw new Error('GitHub token not configured');
-    const prExists = await checkExistingPR(name, githubToken);
+    const userGithubToken = session.accessToken;
+    const prExists = await checkExistingPR(name, userGithubToken);
     if (prExists) {
       return NextResponse.json({ error: 'A pull request with this config name already exists' }, { status: 409 });
     }
@@ -177,7 +176,7 @@ export async function POST(request: NextRequest) {
     const newBranch = `config/add-${folderName}-${Date.now()}`;
     const githubApiBase = 'https://api.github.com';
     const headers = {
-      Authorization: `Bearer ${githubToken}`,
+      Authorization: `Bearer ${userGithubToken}`,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
     };

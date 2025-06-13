@@ -12,6 +12,7 @@ declare module "next-auth" {
       image?: string | null;
       login?: string;
     };
+    accessToken?: string;
   }
 }
 
@@ -20,6 +21,11 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "read:user user:email public_repo"
+        }
+      }
     }),
   ],
   callbacks: {
@@ -27,6 +33,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token.sub) {
         session.user.id = token.sub;
         session.user.login = token.login as string;
+        session.accessToken = token.accessToken as string;
       }
       return session;
     },
@@ -36,6 +43,7 @@ export const authOptions: NextAuthOptions = {
       }
       if (account?.provider === "github") {
         token.login = account.login;
+        token.accessToken = account.access_token;
       }
       return token;
     },
