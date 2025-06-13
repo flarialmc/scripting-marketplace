@@ -68,7 +68,7 @@ function containsBadWords(name: string): boolean {
 
 async function checkExistingPR(name: string, githubToken: string): Promise<boolean> {
   const repoOwner = 'flarialmc';
-  const repoName = 'scripting-marketplace';
+  const repoName = 'configs';
   const githubApiBase = 'https://api.github.com';
   const headers = {
     Authorization: `Bearer ${githubToken}`,
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
     processingRequests.add(folderName);
 
     const repoOwner = 'flarialmc';
-    const repoName = 'scripting-marketplace';
+    const repoName = 'configs';
     const baseBranch = 'main';
     const newBranch = `config/add-${folderName}-${Date.now()}`;
     const githubApiBase = 'https://api.github.com';
