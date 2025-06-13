@@ -113,7 +113,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
             onClick={closeOverlay}
           >
             <Image
-              src={`https://1klcjc8um5aq.flarial.xyz/api/configs/${config.id}/icon.png`}
+              src={`https://marketplace.flarial.xyz/api/configs/${config.id}/icon.png`}
               alt="Full Config Image"
               layout="fill"
               objectFit="contain"
