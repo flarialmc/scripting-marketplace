@@ -116,12 +116,13 @@ class ConfigService {
   }
 
   async getConfigArchive(configId: string): Promise<{ data: string; filename: string; contentType: string }> {
-    const zipUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configId}/${configId}.zip`;
+    const zipUrl = `https://cdn.statically.io/gh/flarialmc/configs/main/${configId}.zip`;
     
     try {
       const response = await fetch(zipUrl);
+      
       if (!response.ok) {
-        throw new Error('Config archive not found');
+        throw new Error(`Config archive not found: ${response.status} ${response.statusText}`);
       }
       
       const buffer = await response.arrayBuffer();
@@ -130,8 +131,8 @@ class ConfigService {
         filename: `${configId}.zip`,
         contentType: 'application/zip',
       };
-    } catch {
-      throw new Error('Config archive not found');
+    } catch (error) {
+      throw new Error(`Config archive not found: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }

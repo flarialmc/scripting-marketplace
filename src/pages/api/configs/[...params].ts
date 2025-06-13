@@ -58,10 +58,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(404).json({ error: 'Not found' });
     }
   } catch (error) {
+    console.error('Config API error:', error);
     if (error instanceof Error && (error.message === 'Config not found' || error.message === 'Icon not found')) {
       res.status(404).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
     }
   }
 }
