@@ -1,5 +1,5 @@
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
@@ -115,14 +115,57 @@ async function sendWebhookNotification(ip: string, configName: string, username:
   }
 }
 
+function createProgressStream() {
+  return {
+    sendProgress: (step: string, percentage: number, details?: string) => {
+      const data = { type: 'progress', step, percentage, details };
+      return `data: ${JSON.stringify(data)}\n\n`;
+    },
+    sendComplete: (data: Record<string, unknown>) => {
+      return `data: ${JSON.stringify({ type: 'complete', ...data })}\n\n`;
+    },
+    sendError: (error: string) => {
+      return `data: ${JSON.stringify({ type: 'error', error })}\n\n`;
+    }
+  };
+}
+
 export async function POST(request: NextRequest) {
+  const encoder = new TextEncoder();
+  const progress = createProgressStream();
+  
+  const stream = new ReadableStream({
+    start(controller) {
+      handleUpload(request, controller, progress, encoder).catch(error => {
+        controller.enqueue(encoder.encode(progress.sendError(error instanceof Error ? error.message : String(error))));
+        controller.close();
+      });
+    }
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+}
+
+async function handleUpload(
+  request: NextRequest, 
+  controller: ReadableStreamDefaultController<Uint8Array>,
+  progress: ReturnType<typeof createProgressStream>,
+  encoder: TextEncoder
+) {
   try {
-   
+    controller.enqueue(encoder.encode(progress.sendProgress('Authenticating...', 5)));
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id || !session.accessToken) {
-        return NextResponse.json({ error: 'Unauthorized: Please sign in with GitHub' }, { status: 401 });
+        throw new Error('Unauthorized: Please sign in with GitHub');
     }
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Processing request...', 10)));
     const githubId = session.user.id;
     const username = session.user.name || 'Unknown';
     const githubLogin = session.user.login || username;
@@ -136,39 +179,41 @@ export async function POST(request: NextRequest) {
     if (!name) throw new Error('Config name is required');
     const generatedId = generateIdFromName(name);
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Validating config...', 15)));
     if (containsBadWords(name)) {
-      return NextResponse.json({ error: 'Config name contains prohibited words' }, { status: 400 });
+      throw new Error('Config name contains prohibited words');
     }
 
     if (ipConfigTracker.has(ip)) {
-      return NextResponse.json({ error: 'Only one config upload allowed per IP' }, { status: 403 });
+      throw new Error('Only one config upload allowed per IP');
     }
 
     if (githubConfigTracker.has(githubId)) {
-      return NextResponse.json({ error: 'Only one config upload allowed per GitHub user' }, { status: 403 });
+      throw new Error('Only one config upload allowed per GitHub user');
     }
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Checking for existing configs...', 20)));
     const userGithubToken = session.accessToken;
     const prExists = await checkExistingPR(name, userGithubToken);
     if (prExists) {
-      return NextResponse.json({ error: 'A pull request with this config name already exists' }, { status: 409 });
+      throw new Error('A pull request with this config name already exists');
     }
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Checking upload limits...', 25)));
     const lastUploadTime = userUploadTracker.get(userIdentifier);
     const currentTime = Date.now();
     if (lastUploadTime && (currentTime - lastUploadTime) < UPLOAD_COOLDOWN) {
       const remainingTime = Math.ceil((UPLOAD_COOLDOWN - (currentTime - lastUploadTime)) / (60 * 1000));
-      return NextResponse.json(
-        { error: `Upload limit reached. Please wait ${remainingTime} minutes before uploading again.` },
-        { status: 403 }
-      );
+      throw new Error(`Upload limit reached. Please wait ${remainingTime} minutes before uploading again.`);
     }
 
     const folderName = generatedId;
     if (processingRequests.has(folderName)) {
-      return NextResponse.json({ error: 'Upload already in progress' }, { status: 429 });
+      throw new Error('Upload already in progress');
     }
     processingRequests.add(folderName);
+    
+    controller.enqueue(encoder.encode(progress.sendProgress('Initializing GitHub operations...', 30)));
 
     const repoOwner = 'flarialmc';
     const repoName = 'configs';
@@ -181,11 +226,13 @@ export async function POST(request: NextRequest) {
       'Content-Type': 'application/json',
     };
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Getting repository information...', 35)));
     const refResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/ref/heads/${baseBranch}`, { headers });
     if (!refResponse.ok) throw new Error(`Failed to get base branch ref: ${await refResponse.text()}`);
     const refData = await refResponse.json();
     const baseSha = refData.object.sha;
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Creating new branch...', 40, `Branch: ${newBranch}`)));
     const createBranchResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs`, {
       method: 'POST',
       headers,
@@ -193,7 +240,7 @@ export async function POST(request: NextRequest) {
     });
     if (!createBranchResponse.ok) throw new Error(`Failed to create branch: ${await createBranchResponse.text()}`);
 
-   
+    controller.enqueue(encoder.encode(progress.sendProgress('Preparing configuration files...', 50)));
     const mainJsonContent = JSON.stringify({
       id: generatedId,
       name: configData.name,
@@ -206,8 +253,13 @@ export async function POST(request: NextRequest) {
       ...files.filter(f => f.name !== 'main.json'),
     ];
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Uploading files to GitHub...', 60, `Processing ${updatedFiles.length} files`)));
     const treeItems = [];
-    for (const file of updatedFiles) {
+    for (let i = 0; i < updatedFiles.length; i++) {
+      const file = updatedFiles[i];
+      const fileProgress = 60 + (i / updatedFiles.length) * 20;
+      controller.enqueue(encoder.encode(progress.sendProgress('Uploading files to GitHub...', Math.round(fileProgress), `Processing ${file.name}...`)));
+      
       const fileContent = Buffer.from(await file.arrayBuffer()).toString('base64');
       const baseFileName = file.name.split('/').pop() || file.name;
       const filePath = `configs/${folderName}/${baseFileName}`;
@@ -221,6 +273,7 @@ export async function POST(request: NextRequest) {
       treeItems.push({ path: filePath, mode: '100644', type: 'blob', sha: blobData.sha });
     }
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Creating file tree...', 80)));
     const treeResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/trees`, {
       method: 'POST',
       headers,
@@ -229,6 +282,7 @@ export async function POST(request: NextRequest) {
     if (!treeResponse.ok) throw new Error(`Failed to create tree: ${await treeResponse.text()}`);
     const treeData = await treeResponse.json();
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Creating commit...', 85)));
     const commitResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/commits`, {
       method: 'POST',
       headers,
@@ -246,6 +300,7 @@ export async function POST(request: NextRequest) {
     if (!commitResponse.ok) throw new Error(`Failed to create commit: ${await commitResponse.text()}`);
     const commitData = await commitResponse.json();
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Updating branch...', 90)));
     const updateRefResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/git/refs/heads/${newBranch}`, {
       method: 'PATCH',
       headers,
@@ -253,6 +308,7 @@ export async function POST(request: NextRequest) {
     });
     if (!updateRefResponse.ok) throw new Error(`Failed to update branch ref: ${await updateRefResponse.text()}`);
 
+    controller.enqueue(encoder.encode(progress.sendProgress('Creating pull request...', 95)));
     const prResponse = await fetch(`${githubApiBase}/repos/${repoOwner}/${repoName}/pulls`, {
       method: 'POST',
       headers,
@@ -265,23 +321,17 @@ export async function POST(request: NextRequest) {
     });
     if (!prResponse.ok) throw new Error(`Failed to create PR: ${await prResponse.text()}`);
 
-   
+    controller.enqueue(encoder.encode(progress.sendProgress('Finalizing...', 98)));
     await sendWebhookNotification(ip, name, username);
 
     ipConfigTracker.set(ip, folderName);
     githubConfigTracker.set(githubId, folderName);
     userUploadTracker.set(userIdentifier, currentTime);
 
-    const response = NextResponse.json({ message: 'Pull request created successfully' }, { status: 200 });
-    if (!request.cookies.get('user_id')) {
-      response.cookies.set('user_id', userIdentifier.split('-')[2], { httpOnly: true, maxAge: 60 * 60 * 24 * 365 });
-    }
-    return response;
+    controller.enqueue(encoder.encode(progress.sendComplete({ message: 'Pull request created successfully' })));
+    controller.close();
   } catch (error) {
-    return NextResponse.json(
-      { error: `Failed to create pull request: ${error instanceof Error ? error.message : String(error)}` },
-      { status: 500 }
-    );
+    throw error;
   } finally {
     processingRequests.clear();
   }

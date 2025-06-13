@@ -36,6 +36,11 @@ function ConfigUploadInner() {
     author: '',
   });
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<{
+    step: string;
+    percentage: number;
+    details?: string;
+  } | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [iconPreview, setIconPreview] = useState<string | null>(null);
@@ -137,6 +142,8 @@ function ConfigUploadInner() {
     }
 
     setIsUploading(true);
+    setUploadProgress({ step: 'Preparing files...', percentage: 5 });
+    
     const formDataToSend = new FormData();
     const updatedFiles = croppedImage
       ? [...files.filter(f => f.name !== 'icon.png'), croppedImage]
@@ -147,24 +154,76 @@ function ConfigUploadInner() {
     formDataToSend.append('githubLogin', session.user.login || session.user.name || '');
 
     try {
+      setUploadProgress({ step: 'Uploading to server...', percentage: 15 });
+      
       const response = await fetch('/api/upload-config', {
         method: 'POST',
         body: formDataToSend,
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || `API request failed with status ${response.status}`);
-      }
+      if (response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let finalData = null;
 
-      const successMsg = `Pull request created successfully for ${formData.name}!`;
-      setSuccessMessage(successMsg);
-      setShowSuccessPopup(true);
-      resetForm();
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const progressData = JSON.parse(line.slice(6));
+                if (progressData.type === 'progress') {
+                  setUploadProgress({
+                    step: progressData.step,
+                    percentage: progressData.percentage,
+                    details: progressData.details
+                  });
+                } else if (progressData.type === 'complete') {
+                  finalData = progressData;
+                }
+              } catch {
+               
+              }
+            }
+          }
+        }
+
+        if (!response.ok) {
+          const errorData = finalData || await response.json();
+          throw new Error(errorData.error || `API request failed with status ${response.status}`);
+        }
+
+        setUploadProgress({ step: 'Upload complete!', percentage: 100 });
+        const successMsg = `Pull request created successfully for ${formData.name}!`;
+        setSuccessMessage(successMsg);
+        setShowSuccessPopup(true);
+        resetForm();
+      } else {
+       
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `API request failed with status ${response.status}`);
+        }
+        
+        setUploadProgress({ step: 'Upload complete!', percentage: 100 });
+        const successMsg = `Pull request created successfully for ${formData.name}!`;
+        setSuccessMessage(successMsg);
+        setShowSuccessPopup(true);
+        resetForm();
+      }
     } catch (err) {
       setError(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -175,6 +234,7 @@ function ConfigUploadInner() {
     setCroppedImage(null);
     setShowIconPicker(false);
     setError(null);
+    setUploadProgress(null);
   };
 
   const closeSuccessPopup = () => {
@@ -308,13 +368,32 @@ function ConfigUploadInner() {
           {error && <p className="text-red-400 mb-4">{error}</p>}
 
           {session && (
-            <button
-              onClick={handleSubmit}
-              disabled={isUploading || files.length === 0 || !formData.name}
-              className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all mb-6 w-full max-w-xs mx-auto"
-            >
-              {isUploading ? 'Uploading...' : 'Submit Config'}
-            </button>
+            <div className="w-full max-w-xs mx-auto mb-6">
+              {uploadProgress && (
+                <div className="mb-4 p-3 bg-black/20 rounded-md">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-white text-sm font-medium">{uploadProgress.step}</span>
+                    <span className="text-white text-sm">{uploadProgress.percentage}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-[#d32f2f] h-2 rounded-full transition-all duration-300 ease-in-out"
+                      style={{ width: `${uploadProgress.percentage}%` }}
+                    ></div>
+                  </div>
+                  {uploadProgress.details && (
+                    <div className="text-gray-300 text-xs mt-2">{uploadProgress.details}</div>
+                  )}
+                </div>
+              )}
+              <button
+                onClick={handleSubmit}
+                disabled={isUploading || files.length === 0 || !formData.name}
+                className="bg-[#d32f2f] text-white px-6 py-2 rounded-md hover:bg-[#b71c1c] disabled:opacity-50 transition-all w-full"
+              >
+                {isUploading ? 'Uploading...' : 'Submit Config'}
+              </button>
+            </div>
           )}
         </div>
 
