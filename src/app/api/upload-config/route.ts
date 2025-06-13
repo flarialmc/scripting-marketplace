@@ -184,14 +184,6 @@ async function handleUpload(
       throw new Error('Config name contains prohibited words');
     }
 
-    if (ipConfigTracker.has(ip)) {
-      throw new Error('Only one config upload allowed per IP');
-    }
-
-    if (githubConfigTracker.has(githubId)) {
-      throw new Error('Only one config upload allowed per GitHub user');
-    }
-
     controller.enqueue(encoder.encode(progress.sendProgress('Checking for existing configs...', 20)));
     const userGithubToken = session.accessToken;
     const prExists = await checkExistingPR(name, userGithubToken);
