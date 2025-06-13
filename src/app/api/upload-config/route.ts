@@ -111,7 +111,7 @@ async function sendWebhookNotification(ip: string, configName: string, username:
     if (!response.ok) {
       throw new Error(`Webhook failed: ${await response.text()}`);
     }
-  } catch (error) {
+  } catch {
   }
 }
 

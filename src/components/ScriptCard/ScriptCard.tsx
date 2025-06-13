@@ -56,7 +56,7 @@ export function ScriptCard({ script }: ScriptCardProps) {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       setIsDropdownOpen(false);
-    } catch (error) {
+    } catch {
      
     }
   };

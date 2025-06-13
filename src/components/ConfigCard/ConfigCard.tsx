@@ -48,7 +48,7 @@ export function ConfigCard({ config }: ConfigCardProps) {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
     }
   };
 
