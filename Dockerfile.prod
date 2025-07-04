@@ -1,0 +1,25 @@
+# Production Dockerfile - expects pre-built artifacts
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install only production dependencies
+COPY package.json ./
+RUN npm install --only=production && npm cache clean --force
+
+# Copy pre-built application
+COPY .next/standalone ./
+COPY .next/static ./.next/static
+COPY public ./public
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+EXPOSE 5020
+ENV PORT=5020
+ENV NODE_ENV=production
+
+CMD ["node", "server.js"]
