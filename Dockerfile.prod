@@ -9,6 +9,8 @@ RUN npm install --only=production && npm cache clean --force
 
 # Copy pre-built application (all files are in the same directory after extraction)
 COPY . ./
+# Explicitly copy .next directory to ensure it's included
+COPY .next ./.next
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
