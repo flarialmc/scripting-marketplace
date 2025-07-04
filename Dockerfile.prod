@@ -7,10 +7,8 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --only=production && npm cache clean --force
 
-# Copy pre-built application
-COPY .next/standalone ./
-COPY .next/static ./.next/static
-COPY public ./public
+# Copy pre-built application (all files are in the same directory after extraction)
+COPY . ./
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
