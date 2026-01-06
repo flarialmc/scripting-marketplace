@@ -11,6 +11,7 @@ export async function listConfigs(): Promise<Config[]> {
       next: { revalidate: 60 }, // Cache for 60 seconds, then revalidate
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'Flarial-Marketplace/1.0',
       },
     });
 
@@ -33,6 +34,9 @@ export async function getConfigDownloadResponse(configId: string): Promise<Respo
         method: 'GET',
         cache: 'no-store',
         mode: 'cors',
+        headers: {
+          'User-Agent': 'Flarial-Marketplace/1.0',
+        },
       }
     );
 
