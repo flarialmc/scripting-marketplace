@@ -10,11 +10,13 @@ import { getConfigDownloadResponse } from '@/services/configs';
 
 interface ConfigCardProps {
   config: Config;
+  priority?: boolean;
 }
 
-export function ConfigCard({ config }: ConfigCardProps) {
+export function ConfigCard({ config, priority = false }: ConfigCardProps) {
   const [showFullImage, setShowFullImage] = useState(false);
   const [isFadingIn, setIsFadingIn] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
    
@@ -57,18 +59,25 @@ export function ConfigCard({ config }: ConfigCardProps) {
       <div className="group relative p-4 rounded-lg bg-[#201a1b]/80 transition-all duration-300 ease-in-out hover:scale-[1.05] hover:z-10 hover:shadow-red-950 shadow-md">
         {/* Config Image with Hover Preview */}
         <div
-          className="relative w-full h-40 bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden cursor-pointer"
+          className="relative w-full h-40 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center rounded-lg overflow-hidden cursor-pointer"
           onClick={() => setShowFullImage(true)}
         >
-          <Image
-            src={`https://cdn.statically.io/gh/flarialmc/configs/main/${config.id}/icon.png`}
-            width={320}
-            height={180}
-            alt={`${config.name} config preview`}
-            className="w-full h-full transition-all duration-300 ease-in-out hover:scale-[1.1] object-cover"
-            loading="lazy"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-          />
+          {!imageError ? (
+            <Image
+              src={`https://cdn.statically.io/gh/flarialmc/configs/main/${config.id}/icon.png`}
+              width={320}
+              height={180}
+              alt={`${config.name} config preview`}
+              className="w-full h-full transition-all duration-300 ease-in-out hover:scale-[1.1] object-cover"
+              loading={priority ? 'eager' : 'lazy'}
+              priority={priority}
+              quality={75}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="text-gray-500 text-sm">No preview</div>
+          )}
         </div>
 
         {/* Config Info */}
