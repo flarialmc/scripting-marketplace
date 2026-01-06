@@ -14,7 +14,7 @@ export async function listScripts(): Promise<Script[]> {
       next: { revalidate: 60 }, // Cache for 60 seconds, then revalidate
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Flarial-Marketplace/1.0',
+        'User-Agent': 'Samsung Smart Fridge',
       },
     });
 
@@ -39,7 +39,7 @@ export async function getScriptDownloadResponse(script: Script): Promise<Respons
       cache: 'no-store',
       headers: {
         'Accept': 'application/octet-stream, */*',
-        'User-Agent': 'Flarial-Marketplace/1.0',
+        'User-Agent': 'Samsung Smart Fridge',
       },
     });
     
