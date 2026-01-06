@@ -62,11 +62,12 @@ export function ConfigCard({ config }: ConfigCardProps) {
         >
           <Image
             src={`https://cdn.statically.io/gh/flarialmc/configs/main/${config.id}/icon.png`}
-            width={1280}
-            height={720}
-            alt="Config Image"
-            unoptimized
+            width={320}
+            height={180}
+            alt={`${config.name} config preview`}
             className="w-full h-full transition-all duration-300 ease-in-out hover:scale-[1.1] object-cover"
+            loading="lazy"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
           />
         </div>
 
@@ -113,12 +114,12 @@ export function ConfigCard({ config }: ConfigCardProps) {
             onClick={closeOverlay}
           >
             <Image
-              src={`https://marketplace.flarial.xyz/api/configs/${config.id}/icon.png`}
-              alt="Full Config Image"
-              layout="fill"
-              objectFit="contain"
-              className={`relative w-full h-full p-6 select-none transition-all duration-500 overflow-hidden ${isFadingIn ? 'scale-[1]' : 'scale-[0.5]'}`}
-              unoptimized
+              src={`https://cdn.statically.io/gh/flarialmc/configs/main/${config.id}/icon.png`}
+              alt={`${config.name} full preview`}
+              fill
+              className={`object-contain p-6 select-none transition-all duration-500 ${isFadingIn ? 'scale-100' : 'scale-50'}`}
+              sizes="100vw"
+              priority
             />
           </div>,
           document.body

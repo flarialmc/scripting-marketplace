@@ -8,8 +8,7 @@ interface ConfigsResponse {
 export async function listConfigs(): Promise<Config[]> {
   try {
     const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CONFIGS.LIST}`, {
-      cache: 'no-store',
-      mode: 'cors',
+      next: { revalidate: 60 }, // Cache for 60 seconds, then revalidate
       headers: {
         'Content-Type': 'application/json',
       },
