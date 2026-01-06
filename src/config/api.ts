@@ -1,11 +1,11 @@
-// Server-side URL (internal Docker network) vs Client-side URL (public)
+// Base URL for API calls - uses marketplace's own API routes
 const getBaseUrl = () => {
-  // Client-side: use public API URL
+  // Client-side: use current origin
   if (typeof window !== 'undefined') {
-    return process.env.NEXT_PUBLIC_API_URL || window.location.origin;
+    return window.location.origin;
   }
-  // Server-side: use internal Docker URL if available, fall back to public URL
-  return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  // Server-side: use internal localhost (same container)
+  return 'http://localhost:5020';
 };
 
 export const API_CONFIG = {
