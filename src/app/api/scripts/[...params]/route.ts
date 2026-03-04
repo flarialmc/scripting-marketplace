@@ -16,7 +16,7 @@ async function fetchScriptIndex(scriptType: 'module' | 'command'): Promise<Scrip
 }
 
 async function fetchScriptContent(scriptType: 'module' | 'command', filename: string): Promise<string> {
-  const scriptUrl = `https://cdn.statically.io/gh/flarialmc/scripts/main/${scriptType}/${filename}`;
+  const scriptUrl = `https://raw.githubusercontent.com/flarialmc/scripts/main/${scriptType}/${encodeURIComponent(filename)}`;
   const response = await fetch(scriptUrl, { next: { revalidate: 300 } });
   if (!response.ok) {
     throw new Error('Script not found');
