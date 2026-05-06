@@ -24,6 +24,10 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Cap V8 heap during the Next.js build. The deploy host is a 3.8 GiB VPS
+# and unbounded `next build` has driven it into OOM.
+ENV NODE_OPTIONS=--max-old-space-size=1024
+
 RUN pnpm run build
 
 # Production image, copy all the files and run next
